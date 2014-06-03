@@ -17,10 +17,13 @@
 package de.bonn.limes.pubmed;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -53,7 +56,6 @@ public class PubMedFetcher {
     final static String ISSUE = "Issue";
     final static String PMID = "PMID";
 
-
     /**
      * Retrieve a list of pubmed records associated with the list of pubmed ids
      *
@@ -63,26 +65,36 @@ public class PubMedFetcher {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    public List<PubMedRecord> getPubMedRecordForIDs(List<Integer> pubmedIDs) throws IOException, ParserConfigurationException, SAXException {
-        StringBuilder strb = new StringBuilder();
-        for (Integer id : pubmedIDs) {
-            strb.append(",").append(id);
-        }
-
-        if (pubmedIDs.isEmpty()) {
-            System.err.println("Warning : no ids found in pubmed id list");
-            return new ArrayList<>();
-        }
-        URL eutils = new URL(eutilsURL + "db=pubmed&id=" + strb.toString().substring(1) + "&retmode=xml");
-        Document doc = retriveDocument(eutils);
-        List<PubMedRecord> records = new ArrayList<>(2);
+    public List<PubMedRecord> getPubMedRecordForIDs(List<Integer> pubmedIDs) throws ParserConfigurationException{
         try {
-            records = parseDomToPubMed(doc);
-        } catch (XMLParseException e) {
-            System.err.println("Error reading pubmed records : " + e.getMessage());
+            StringBuilder strb = new StringBuilder();
+            for (Integer id : pubmedIDs) {
+                strb.append(",").append(id);
+            }
+            
+            if (pubmedIDs.isEmpty()) {
+                System.err.println("Warning : no ids found in pubmed id list");
+                return new ArrayList<>();
+            }
+            URL eutils = new URL(eutilsURL + "db=pubmed&id=" + strb.toString().substring(1) + "&retmode=xml");
+            Document doc = retriveDocument(eutils);
+            List<PubMedRecord> records = new ArrayList<>(2);
+            try {
+                records = parseDomToPubMed(doc);
+            } catch (XMLParseException e) {
+                System.err.println("Error reading pubmed records : " + e.getMessage());
+            }
+            
+            return records;
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return records;
+        System.out.println("This is the problem");
+        return null;
     }
 
     /**

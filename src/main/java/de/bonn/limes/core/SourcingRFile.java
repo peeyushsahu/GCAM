@@ -26,6 +26,7 @@ import static de.bonn.limes.core.StartRserve.launchRserve;
 import java.io.File;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
  
@@ -65,20 +66,30 @@ public class SourcingRFile {
 			);
 	}
             
-        
-        public void analyse() throws RserveException, REXPMismatchException {       
+        //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException{
+        public void analyse() throws RserveException, REXPMismatchException, REngineException {       
 
-
+                
+                checkLocalRserve();
                 RConnection c = new RConnection();
                 // source the Palindrom function
-                c.eval("source(\"/home/peeyush/Desktop/palindrome.R\")");
-
+                      
+                //c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
+                
+                c.assign(".tmp.", "source(\"/home/peeyush/Desktop/palindrome.R\")");
+                REXP r = c.parseAndEval("try(eval(parse(text=.tmp.)),silent=TRUE)");
+                if (r.inherits("try-error")) System.err.println("Error: "+r.toString());
+                else { 
+                
+                c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
                 // call the function. Return true
-                REXP is_aba_palindrome = c.eval("palindrome('/home/peeyush/Desktop/firstResult.csv',0.4)");
-                System.out.println("Number of cell types with enrichment:   "+is_aba_palindrome.asInteger()); // prints 1 => true
+                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/firstResult.csv',0.2)");
+                System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
+                }
+                                
+                
                 c.shutdown();
-
-
+       
             }
  
 }

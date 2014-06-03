@@ -89,12 +89,20 @@ public class PubmedSearch {
         LOG.debug("Found {} ids for query '{}'", count, query);
 
         List<Integer> articleIds = new ArrayList<>();
-        String[] idList = res.getIdList().getId();
-        for (String id : idList) {
-            articleIds.add(new Integer(id));
-        }
-        assert (count == articleIds.size()) : "result counts should match, "
-                + articleIds.size() + ":" + count;
+        if(count != 0){
+            if(count < 20000)
+                { //this is added by me
+
+                String[] idList = res.getIdList().getId();
+                for (String id : idList) {
+                    articleIds.add(new Integer(id));
+                }
+                assert (count == articleIds.size()) : "result counts should match, "
+                        + articleIds.size() + ":" + count;
+                return articleIds;
+                }
+            }
+        articleIds.add(0);
         return articleIds;
     }
 }

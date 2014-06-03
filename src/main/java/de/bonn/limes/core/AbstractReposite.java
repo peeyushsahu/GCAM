@@ -50,19 +50,26 @@ public class AbstractReposite {
         try {
             TreeMap<String,List> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
             List<PubMedAbstract> abstracts; // holds all PubMedAbstract object for gene list
-
+        
+            
             for (String gene: Glist){
                 System.out.println(gene.length());
                 if(gene.length()!=0){
                 abstracts = new ArrayList<>();
                 System.out.println("Gene for abstract:  "+gene);
-                List<Integer> ids = new PubmedSearch().getPubMedIDs(gene);
-                    System.out.println("+++++++++++++++++++"+ids.isEmpty());
+                List<Integer> ids = new PubmedSearch().getPubMedIDs(gene,3500);
+                
+                System.out.println("+++++++++++++++++++"+ids.isEmpty());
                 if(ids.get(0)!= 0){
                 System.out.println(ids);
-                    if(ids.size()< 50){
+                    
+                
+                // if PMID list has less than 50 ids
+                    if(ids.size()< 500){
                     List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(ids);
-
+                        if(records == null){
+                            System.out.println("No abstract to show..");
+                        }
 
                         for (PubMedRecord record : records) {
 
@@ -78,30 +85,33 @@ public class AbstractReposite {
                             */
                         }       
                     }
-              //if Abstract/gene is grater then the limit
-                else{
-                     
-                    int per_run = ids.size()/30;
-            
-                    List<List<Integer>> parts = Lists.partition(ids, per_run);
-                    for(List<Integer> Slist:parts){
+              
+                // if
                     
+                else{                     
+                    int countabst=0;    
+                    List<List<Integer>> parts = Lists.partition(ids,500);
+                    for(List<Integer> Slist:parts){
+                        
+                        System.out.println(Slist.size());
                         List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(Slist);
-                        Thread.sleep(1000);
+                        countabst++;
+                        //System.out.println(gene);
+                        System.out.println("For "+gene+" number of abstracts Fetched:   "+countabst*500);
             
                 
             
-             for (PubMedRecord record : records) {
-                
-                PubMedAbstract abs = new PubMedAbstract();
-                abs.setAbstractText(record.getAbstract());
-                abs.setPMID(record.getPubMedID());
-                abs.setTitle(record.getTitle());
-                abs.setYear(String.valueOf(record.getYear()));
-                abstracts.add(abs);
-             }
-           } 
-          }          
+                         for (PubMedRecord record : records) {
+
+                            PubMedAbstract abs = new PubMedAbstract();
+                            abs.setAbstractText(record.getAbstract());
+                            abs.setPMID(record.getPubMedID());
+                            abs.setTitle(record.getTitle());
+                            abs.setYear(String.valueOf(record.getYear()));
+                            abstracts.add(abs);
+                         }
+                    } 
+                }          
          }   
                 
                 System.out.println("Size of Abstracts:  "+abstracts.size());
@@ -117,8 +127,8 @@ public class AbstractReposite {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
                   } catch (RemoteException ex) {
                           Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-                          } catch (IOException | ParserConfigurationException | SAXException ex) {
-                                Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+                          } catch (ParserConfigurationException ex) {
+            Logger.getLogger(AbstractReposite.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     

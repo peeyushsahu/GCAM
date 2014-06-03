@@ -25,6 +25,11 @@ import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
 import de.bonn.limes.utils.Utility;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,7 +41,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
@@ -47,6 +57,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 /**
@@ -355,7 +366,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
             Entity2cell occurrenceTable = new Entity2cell();
             occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
-            br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult.csv"));
+            br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult_2.csv"));
             StringBuilder csvFile = new StringBuilder();
 
             for (Occurrenceobj result : occurrenceResult) {
@@ -558,6 +569,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }//GEN-LAST:event_uploadFileActionPerformed
 
     private void HeatMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HeatMapActionPerformed
+       /*
         try {
             SourcingRFile DoinR = new SourcingRFile();
             DoinR.checkLocalRserve();
@@ -566,9 +578,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (REXPMismatchException ex) {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (REngineException ex) {
+            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+       */
+       enrichmentAnalysis performAnalysis = new enrichmentAnalysis();
+       performAnalysis.runthis();
     }//GEN-LAST:event_HeatMapActionPerformed
 
     /**
