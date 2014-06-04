@@ -158,8 +158,8 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="statusBar" max="32767" attributes="0"/>
-                                          <Component id="statusBar1" pref="452" max="32767" attributes="0"/>
+                                          <Component id="statusBar" pref="452" max="32767" attributes="0"/>
+                                          <Component id="statusBar1" max="32767" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="fetchAbstracts" min="-2" max="-2" attributes="0"/>
@@ -271,14 +271,17 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="1" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="ProgressBar" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="325" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jScrollPane1" pref="313" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                      <Component id="ProgressBar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -310,6 +313,11 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JProgressBar" name="ProgressBar">
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
+              </AuxValues>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

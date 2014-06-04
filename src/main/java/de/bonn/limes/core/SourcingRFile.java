@@ -67,7 +67,7 @@ public class SourcingRFile {
 	}
             
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException{
-        public void analyse() throws RserveException, REXPMismatchException, REngineException {       
+        public void analyse(Double threshold) throws RserveException, REXPMismatchException, REngineException {       
 
                 
                 checkLocalRserve();
@@ -83,7 +83,7 @@ public class SourcingRFile {
                 
                 c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
                 // call the function. Return true
-                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/firstResult.csv',0.2)");
+                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/firstResult.csv',"+threshold+")");
                 System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 

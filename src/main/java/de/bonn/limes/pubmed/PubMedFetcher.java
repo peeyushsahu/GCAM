@@ -65,36 +65,36 @@ public class PubMedFetcher {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    public List<PubMedRecord> getPubMedRecordForIDs(List<Integer> pubmedIDs) throws ParserConfigurationException{
+    public List<PubMedRecord> getPubMedRecordForIDs(List<Integer> pubmedIDs) {
         try {
             StringBuilder strb = new StringBuilder();
             for (Integer id : pubmedIDs) {
                 strb.append(",").append(id);
             }
-            
+
             if (pubmedIDs.isEmpty()) {
                 System.err.println("Warning : no ids found in pubmed id list");
                 return new ArrayList<>();
             }
             URL eutils = new URL(eutilsURL + "db=pubmed&id=" + strb.toString().substring(1) + "&retmode=xml");
             Document doc = retriveDocument(eutils);
-            List<PubMedRecord> records = new ArrayList<>(2);
+            List<PubMedRecord> records = new ArrayList<>();
             try {
                 records = parseDomToPubMed(doc);
+                return records;
             } catch (XMLParseException e) {
-                System.err.println("Error reading pubmed records : " + e.getMessage());
+                System.err.println(e.getCause());
+                return new ArrayList<>();
             }
-            
-            return records;
+
         } catch (MalformedURLException ex) {
-            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(PubMedFetcher.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex.getCause());
+            return new ArrayList<>();
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
+            System.err.println(ex.getCause());
+            return new ArrayList<>();
         }
-        System.out.println("This is the problem");
-        return null;
+
     }
 
     /**

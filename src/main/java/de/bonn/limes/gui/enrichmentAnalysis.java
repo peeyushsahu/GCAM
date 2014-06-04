@@ -56,7 +56,7 @@ public class enrichmentAnalysis extends javax.swing.JFrame {
         analyse = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("Select cellType for analysis:");
 
@@ -137,11 +137,20 @@ public class enrichmentAnalysis extends javax.swing.JFrame {
 
     private void analyseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analyseActionPerformed
         
+            
+        Double threshold = Double.parseDouble(TextField4threshold.getText());
+        if(threshold==0){
+            // produce error message
+        }
+            
           try {
             SourcingRFile DoinR = new SourcingRFile();
             DoinR.checkLocalRserve();
-            DoinR.analyse();
-        } catch (RserveException ex) {
+            DoinR.analyse(threshold);
+            //setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+            this.dispose();
+            
+          } catch (RserveException ex) {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (REXPMismatchException | REngineException ex) {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);

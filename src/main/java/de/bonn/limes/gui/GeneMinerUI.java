@@ -20,16 +20,13 @@ import de.bonn.limes.core.AbstractReposite;
 import de.bonn.limes.core.AbstractTagger;
 import de.bonn.limes.core.Entity2cell;
 import de.bonn.limes.core.ReadTextFile;
-import de.bonn.limes.core.SourcingRFile;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
 import de.bonn.limes.utils.Utility;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.Rectangle;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,24 +38,19 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngineException;
-import org.rosuda.REngine.Rserve.RserveException;
 
 /**
  *
@@ -104,6 +96,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         abstractPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         abstractShow = new javax.swing.JEditorPane();
+        ProgressBar = new javax.swing.JProgressBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -171,8 +164,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
                                 .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(statusBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE))
+                                    .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
+                                    .addComponent(statusBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -220,13 +213,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
         abstractPanel.setLayout(abstractPanelLayout);
         abstractPanelLayout.setHorizontalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jScrollPane1)
+            .addComponent(ProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         abstractPanelLayout.setVerticalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, abstractPanelLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
+            .addGroup(abstractPanelLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout outerPanelLayout = new javax.swing.GroupLayout(outerPanel);
@@ -311,11 +307,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
         private AbstractTagger.OPERATION operation;
         //private TreeMap<String, List> abstracts;
         /*
-        public UITagger(TreeMap<String, List> abstracts) {
-            this.abstracts = abstracts;
-        }
-        */
-        
+         public UITagger(TreeMap<String, List> abstracts) {
+         this.abstracts = abstracts;
+         }
+         */
+
         @Override
         protected void done() {
             statusBar.setText("NER analysis finished");
@@ -334,15 +330,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
                     case NER:
                         AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                         abnerResults = nerTagger.tagAbstracts();
+                        abnerResults = nerTagger.tagAbstracts();
                         abstracts = nerTagger.getAbstracts();
-                        List<PubMedAbstract> res = abstracts.get("StarD4");
-                        /*
-                        for (PubMedAbstract a : res) {
-                            System.out.println("Tagged: " + a.getCompleteAbstract());
-                        }
-                        break;
-                        */
+                        
+                    /*
+                        
+                     for (PubMedAbstract a : res) {
+                     System.out.println("Tagged: " + a.getCompleteAbstract());
+                     }
+                     break;
+                     */
                 }
 
             } else {
@@ -362,6 +359,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         BufferedWriter br = null;
         try {
             // step 5: Occurrence analysis of cell types in named entity
+            statusBar.setText("Occurrence analysis running....");
             ReadTextFile cellEntity = new ReadTextFile();
             entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
             Entity2cell occurrenceTable = new Entity2cell();
@@ -428,7 +426,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         }
 
         @Override
-        protected Void doInBackground() throws Exception {
+        protected Void doInBackground() {
             all_genes = reader.extract(geneList.getAbsolutePath());
 
             statusBar.setText("Fetching is started....");
@@ -468,14 +466,18 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
             // step 3: fetch the abstracts and save
             AbstractReposite abstractFetcher = new AbstractReposite();
-            abstracts = abstractFetcher.getAbstracts(queries);
-            System.out.println("Total abstracts: " + abstracts.size());
-            for (Map.Entry<String, List> abs : abstracts.entrySet()) {
-                System.out.println(abs.getKey() + " " + abs.getValue().size());
+            try {       
+                System.err.println("Nothing is working");
+                abstracts = abstractFetcher.getAbstracts(queries);
+                System.out.println("Total abstracts: " + abstracts.size());
+                for (Map.Entry<String, List> abs : abstracts.entrySet()) {
+                    System.out.println(abs.getKey() + " " + abs.getValue().size());
+                }
+
+                totAbs = buildTree(abstracts);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            totAbs = buildTree(abstracts);
-
             return null;
         }
 
@@ -549,13 +551,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
             int pmid = abst.getPMID();
             if (id == pmid) {
                 //System.out.println(abst.getUpdatedAbstract()==null);
-                if(abst.getUpdatedAbstract()==null){
+                if (abst.getUpdatedAbstract() == null) {
                     return abst.getCompleteAbstract();
-                }
-                else{
+                } else {
                     return abst.getUpdatedAbstract();
-                }     
-            }    
+                }
+            }
         }
 
         return null;
@@ -569,21 +570,21 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }//GEN-LAST:event_uploadFileActionPerformed
 
     private void HeatMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HeatMapActionPerformed
-       /*
-        try {
-            SourcingRFile DoinR = new SourcingRFile();
-            DoinR.checkLocalRserve();
-            DoinR.analyse();
-        } catch (RserveException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (REXPMismatchException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (REngineException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       */
-       enrichmentAnalysis performAnalysis = new enrichmentAnalysis();
-       performAnalysis.runthis();
+        /*
+         try {
+         SourcingRFile DoinR = new SourcingRFile();
+         DoinR.checkLocalRserve();
+         DoinR.analyse();
+         } catch (RserveException ex) {
+         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (REXPMismatchException ex) {
+         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+         } catch (REngineException ex) {
+         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         */
+        enrichmentAnalysis performAnalysis = new enrichmentAnalysis();
+        performAnalysis.runthis();
     }//GEN-LAST:event_HeatMapActionPerformed
 
     /**
@@ -596,27 +597,28 @@ public class GeneMinerUI extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+            UIManager.installLookAndFeel("SeaGlass", "com.seaglasslookandfeel.SeaGlassLookAndFeel");
+            UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+            System.err.println("Seaglass LAF not available using Ocean.");
+            try {
+                UIManager.setLookAndFeel(new MetalLookAndFeel());
+            } catch (UnsupportedLookAndFeelException e2) {
+                System.err.println("Unable to use Ocean LAF using default.");
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GeneMinerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GeneMinerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GeneMinerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GeneMinerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GeneMinerUI().setVisible(true);
+                GeneMinerUI ui = new GeneMinerUI();
+                ui.setVisible(true);
+                GraphicsConfiguration gc = ui.getGraphicsConfiguration();
+                Rectangle bounds = gc.getBounds();
+                Dimension size = ui.getPreferredSize();
+                ui.setLocation((int) ((bounds.width / 2) - (size.getWidth() / 2)),
+                        (int) ((bounds.height / 2) - (size.getHeight() / 2)));
             }
         });
     }
@@ -625,6 +627,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem HeatMap;
     private javax.swing.JMenuItem NerAnalysis;
     private javax.swing.JMenuItem OccurrenceAnalysis;
+    public static javax.swing.JProgressBar ProgressBar;
     private javax.swing.JPanel abstractPanel;
     private javax.swing.JEditorPane abstractShow;
     private javax.swing.JTextField additionalQuery;

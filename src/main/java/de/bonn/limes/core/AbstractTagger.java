@@ -32,12 +32,15 @@ import java.util.logging.Logger;
 /**
  *
  * @author peeyush
- *
- * This class is of no use with ABNER
+ * This class performs the NER on all fetched abstracts.
+ * This class is for tagging abstracts with the named entity to show them in display with 
+ * yellow highlight.
+ * This updates abstract text with html quoted text.
  *
  */
 public class AbstractTagger {
-
+    
+    
     public static enum OPERATION {
 
         /**
@@ -89,9 +92,9 @@ public class AbstractTagger {
                         if (a.getPMID() == pmid) {
                             String newabs = absText;
                             a.setCompleteAbstract(newabs);
-                            System.out.println(newabs);
-                            System.out.println("++++++++++++++++++++++++++++++++++++");
-                            System.out.println(a.getUpdatedAbstract()+a.getPMID());
+                            //System.out.println(newabs);
+                            //System.out.println("++++++++++++++++++++++++++++++++++++");
+                            //System.out.println(a.getUpdatedAbstract()+a.getPMID());
                          }
                     }
                                                               
