@@ -18,8 +18,14 @@
 package de.bonn.limes.gui;
 
 import de.bonn.limes.core.SourcingRFile;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -162,33 +168,35 @@ public class enrichmentAnalysis extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public void runthis() {
-        /* Set the Nimbus look and feel */
+         /* Set the SeaGlass look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+         try {
+            UIManager.installLookAndFeel("SeaGlass", "com.seaglasslookandfeel.SeaGlassLookAndFeel");
+            UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+            System.err.println("Seaglass LAF not available using Ocean.");
+            try {
+                UIManager.setLookAndFeel(new MetalLookAndFeel());
+            } catch (UnsupportedLookAndFeelException e2) {
+                System.err.println("Unable to use Ocean LAF using default.");
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(enrichmentAnalysis.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(enrichmentAnalysis.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(enrichmentAnalysis.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(enrichmentAnalysis.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new enrichmentAnalysis().setVisible(true);
+                //new enrichmentAnalysis().setVisible(true);
+                enrichmentAnalysis ui = new enrichmentAnalysis();
+                ui.setVisible(true);
+                GraphicsConfiguration gc = ui.getGraphicsConfiguration();
+                Rectangle bounds = gc.getBounds();
+                Dimension size = ui.getPreferredSize();
+                ui.setLocation((int) ((bounds.width / 2) - (size.getWidth() / 2)),
+                        (int) ((bounds.height / 2) - (size.getHeight() / 2)));
             }
         });
     }
