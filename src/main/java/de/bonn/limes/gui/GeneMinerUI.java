@@ -18,6 +18,7 @@ package de.bonn.limes.gui;
 
 import de.bonn.limes.core.AbstractReposite;
 import de.bonn.limes.core.AbstractTagger;
+import de.bonn.limes.core.CheckSynonymes;
 import de.bonn.limes.core.Entity2cell;
 import de.bonn.limes.core.ReadTextFile;
 import de.bonn.limes.document.PubMedAbstract;
@@ -63,12 +64,14 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private JTree tree;
     private List<String> queries = new ArrayList<>();
     private List<String> all_genes = new ArrayList<>();
+    private List<String> new_all_genes = new ArrayList<>();
     private TreeMap<String, List> abstracts = new TreeMap<>();
     private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
     private File geneList;
     private List<String> entities2compare = new ArrayList<>();
     private ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
     private ReadTextFile reader = new ReadTextFile();
+    private List<List<String>> synonyms = new ArrayList<>();
 
     /**
      * Creates new form GeneMinerUI
@@ -88,6 +91,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         outerPanel = new javax.swing.JPanel();
         resultPanel = new javax.swing.JPanel();
+        abstractPanel = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        abstractShow = new javax.swing.JEditorPane();
+        ProgressBar = new javax.swing.JProgressBar();
+        statusBar = new javax.swing.JLabel();
         queryPanel = new javax.swing.JPanel();
         inputFile = new javax.swing.JTextField();
         uploadFile = new javax.swing.JButton();
@@ -95,11 +103,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         additionalQuery = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         fetchAbstracts = new javax.swing.JButton();
-        abstractPanel = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        abstractShow = new javax.swing.JEditorPane();
-        ProgressBar = new javax.swing.JProgressBar();
-        statusBar = new javax.swing.JLabel();
+        synonymCheck = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -127,6 +131,42 @@ public class GeneMinerUI extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        abstractPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        abstractShow.setEditable(false);
+        abstractShow.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        abstractShow.setMinimumSize(new java.awt.Dimension(100, 23));
+        abstractShow.setPreferredSize(new java.awt.Dimension(100, 23));
+        jScrollPane1.setViewportView(abstractShow);
+
+        ProgressBar.setIndeterminate(true);
+        ProgressBar.setString("");
+        ProgressBar.setStringPainted(true);
+        ProgressBar.setVerifyInputWhenFocusTarget(false);
+
+        statusBar.setForeground(new java.awt.Color(3, 26, 249));
+        statusBar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+        javax.swing.GroupLayout abstractPanelLayout = new javax.swing.GroupLayout(abstractPanel);
+        abstractPanel.setLayout(abstractPanelLayout);
+        abstractPanelLayout.setHorizontalGroup(
+            abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+            .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(ProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        abstractPanelLayout.setVerticalGroup(
+            abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(abstractPanelLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         queryPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         queryPanel.setFont(new java.awt.Font("DejaVu Sans Mono", 0, 15)); // NOI18N
 
@@ -152,6 +192,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         });
 
+        synonymCheck.setText("Add synonyms for genes");
+
         javax.swing.GroupLayout queryPanelLayout = new javax.swing.GroupLayout(queryPanel);
         queryPanel.setLayout(queryPanelLayout);
         queryPanelLayout.setHorizontalGroup(
@@ -167,10 +209,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     .addGroup(queryPanelLayout.createSequentialGroup()
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(synonymCheck)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(inputFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE))
+                            .addComponent(inputFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(uploadFile, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
@@ -189,48 +232,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(additionalQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(fetchAbstracts)
+                .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fetchAbstracts)
+                    .addComponent(synonymCheck))
                 .addContainerGap(24, Short.MAX_VALUE))
-        );
-
-        abstractPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        abstractShow.setEditable(false);
-        abstractShow.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
-        abstractShow.setMinimumSize(new java.awt.Dimension(100, 23));
-        abstractShow.setPreferredSize(new java.awt.Dimension(100, 23));
-        jScrollPane1.setViewportView(abstractShow);
-
-        ProgressBar.setIndeterminate(true);
-        ProgressBar.setString("");
-        ProgressBar.setStringPainted(true);
-        ProgressBar.setVerifyInputWhenFocusTarget(false);
-
-        statusBar.setForeground(new java.awt.Color(3, 26, 249));
-        statusBar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-        javax.swing.GroupLayout abstractPanelLayout = new javax.swing.GroupLayout(abstractPanel);
-        abstractPanel.setLayout(abstractPanelLayout);
-        abstractPanelLayout.setHorizontalGroup(
-            abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(abstractPanelLayout.createSequentialGroup()
-                .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
-        abstractPanelLayout.setVerticalGroup(
-            abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(abstractPanelLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
         );
 
         javax.swing.GroupLayout outerPanelLayout = new javax.swing.GroupLayout(outerPanel);
@@ -322,14 +327,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
         tagger.execute();
     }//GEN-LAST:event_NerAnalysisActionPerformed
 
+    /**
+     * This is Swing threading for NER 
+     */
+    
     class UITagger extends SwingWorker<Void, Void> {
-
-        //private TreeMap<String, List> abstracts;
-        /*
-         public UITagger(TreeMap<String, List> abstracts) {
-         this.abstracts = abstracts;
-         }
-         */
         @Override
         protected void done() {
             ProgressBar.setVisible(false);
@@ -345,14 +347,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 abnerResults = nerTagger.tagAbstracts();
                 abstracts = nerTagger.getAbstracts();
 
-                /*
-                        
-                 for (PubMedAbstract a : res) {
-                 System.out.println("Tagged: " + a.getCompleteAbstract());
-                 }
-                 break;
-                 */
-            } else {
+            } 
+            else {
             }
             UIoccurrence occurrence = new UIoccurrence();
             occurrence.execute();
@@ -361,6 +357,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
         }
 
     }
+    
+    /**
+     * This is for the occurrence analysis
+     */
 
     class UIoccurrence extends SwingWorker<Void, Void> {
 
@@ -450,9 +450,19 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
-            statusBar.setText("Fetching started.");
+            statusBar.setText("Fetching started....");
             ProgressBar.setVisible(true);
-
+            
+            //check for synonyms
+            if(synonymCheck.isSelected()){
+                System.out.println("Synonyms are being considered");
+                synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/HSA_gene_synonym.csv", ",");
+                CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                new_all_genes = cSynonym.withSynonym(synonyms);
+                System.out.println("Size of synonym list:   "+new_all_genes.size());
+                
+            }
+            
             // step 2: get additional query words
             String additionalQ = additionalQuery.getText().trim();
             if (!additionalQ.isEmpty()) {
@@ -461,7 +471,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     String[] adds = additionalQ.split(",");
                     List<String> qWords = Arrays.asList(adds);
 
-                    for (String gene : all_genes) {
+                    for (String gene : new_all_genes) {
 
                         StringBuilder queryBuider = new StringBuilder();
                         if (!qWords.isEmpty()) {
@@ -475,14 +485,14 @@ public class GeneMinerUI extends javax.swing.JFrame {
                         }
                     }
                 } else {
-                    for (String gene : all_genes) {
+                    for (String gene : new_all_genes) {
                         StringBuilder queryBuider = new StringBuilder();
                         queryBuider.append(gene).append(" AND ").append(additionalQ);
                         queries.add(queryBuider.toString());
                     }
                 }
             } else {
-                for (String gene : all_genes) {
+                for (String gene : new_all_genes) {
                     queries.add(gene);
                 }
             }
@@ -490,7 +500,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             // step 3: fetch the abstracts and save
             AbstractReposite abstractFetcher = new AbstractReposite();
             try {
-                System.err.println("Nothing is working");
+                System.out.println("Fetching is working");
                 abstracts = abstractFetcher.getAbstracts(queries);
                 System.out.println("Total abstracts: " + abstracts.size());
                 for (Map.Entry<String, List> abs : abstracts.entrySet()) {
@@ -589,7 +599,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
         if (geneList.exists()) {
             inputFile.setText(geneList.getAbsolutePath());
-            all_genes = reader.extract(geneList.getAbsolutePath());
+            all_genes = reader.extract(geneList.getAbsolutePath());      
 
         }
     }//GEN-LAST:event_uploadFileActionPerformed
@@ -680,6 +690,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JPanel queryPanel;
     private javax.swing.JPanel resultPanel;
     private javax.swing.JLabel statusBar;
+    private javax.swing.JCheckBox synonymCheck;
     private javax.swing.JButton uploadFile;
     // End of variables declaration//GEN-END:variables
 }

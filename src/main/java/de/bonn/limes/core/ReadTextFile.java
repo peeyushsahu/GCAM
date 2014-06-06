@@ -32,10 +32,10 @@ import java.util.List;
  */
 public class ReadTextFile {
 
-    List<String> entityNames = new ArrayList();
-    String fileName;
-    List<List<String>> synonymList = new ArrayList<>();
-    List<String> synonymes;
+    private List<String> entityNames = new ArrayList();
+    private String fileName;
+    private List<List<String>> synonymList = new ArrayList<>();
+    private List<String> synonymes;
 
     /**
      * This method will read text file 
@@ -57,7 +57,7 @@ public class ReadTextFile {
 
                 // use comma seprated file to retrieve text
                 String[] Sline = line.split(delimiter);
-                entityNames.add(Sline[0]);
+                entityNames.add(Sline[0].trim());
 
             }
             return entityNames;
@@ -94,7 +94,7 @@ public class ReadTextFile {
                 synonymes = new ArrayList<>();
                 for(String aliase:synonym){
                     if(!aliase.equals("0")){
-                   synonymes.add(aliase);
+                        synonymes.add(aliase.trim());
                     }
                 }
                synonymList.add(synonymes);

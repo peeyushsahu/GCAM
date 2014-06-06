@@ -17,10 +17,47 @@
 
 package de.bonn.limes.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author peeyush
  */
 public class CheckSynonymes {
+    
+    private List<String> genes;
+    private List<String> geneWidSynonym;
+    private ReadTextFile reader;
+    private List<List<String>> synonyms;
+
+    public CheckSynonymes(List allGenes) {
+        this.geneWidSynonym = new ArrayList();
+        this.reader = new ReadTextFile();
+        this.genes=allGenes;
+    }
+    
+    public List withSynonym(List synonym){
+        this.synonyms = synonym;
+        for(String gene:genes){
+            System.out.println("Gene:"+gene);
+            for(List eliaseList:synonyms){
+                List<String> geneList = eliaseList;
+               for(String eliase:geneList){
+                    if(gene.toLowerCase().equals(eliase.toLowerCase())){
+                        System.out.println("elisase:"+eliase);
+                        for(String elias:geneList){
+                            geneWidSynonym.add(elias);
+                        }
+                        System.out.println("size of aliase list:"+geneList.size());
+                        break; 
+                    }
+                    
+                }                
+            }
+        }
+        return geneWidSynonym;
+        
+    }
     
 }
