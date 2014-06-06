@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ConsensusPathDB SOAP/WSDL document/literal web service - by Atanas Kamburov - MPIMG -->
+<!-- major revision  2012-Apr-25 -->
+<!-- created         2012-Apr-25 -->
+<definitions      name="cpdb"
+       targetNamespace="cpdbns"
+                 xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:tns="cpdbns"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <documentation>
+  ConsensusPathDB is a database that integrates pathway and interaction resources like Reactome, HumanCyc, IntAct, 
+  Pathway Interaction Database and others. ConsensusPathDB contains biochemical reactions, protein interactions, 
+  genetic interactions, gene regulatory interactions and drug-target interactions involving different types of 
+  physical entities like genes, RNA, proteins, complexes, metabolites. The provided web services offer pathway 
+  analysis functionality for user-specified lists of genes or metabolites.
+ </documentation>
+
+	<types>
+        <xsd:schema   elementFormDefault="qualified"
+                         targetNamespace="cpdbns"
+                               xmlns:tns="cpdbns"
+                               xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+			<xsd:element name="getCpdbVersion"> 
+				<xsd:complexType>
+				</xsd:complexType>
+			</xsd:element> 
+			
+			<xsd:element name="getCpdbVersionResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="cpdbVersion"         type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="getAvailableAccessionTypes"> 
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="entityType"          type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element> 
+			
+			<xsd:element name="getAvailableAccessionTypesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="accType"             type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="mapAccessionNumbers">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="accType"             type="xsd:string" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="accNumbers"          type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="mapAccessionNumbersResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="accNumber"           type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> 
+						<xsd:element name="cpdbId"              type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="getAvailableFsetTypes"> 
+                <xsd:complexType>
+                    <xsd:sequence>
+						<xsd:element name="entityType"          type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+                </xsd:complexType>
+			</xsd:element> 
+			
+			<xsd:element name="getAvailableFsetTypesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="fsetType"            type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="description"         type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="getDefaultBackgroundSize">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="fsetType"            type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="accType"             type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="getDefaultBackgroundSizeResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="bgSize"              type="xsd:string" minOccurs="1" maxOccurs="1"/> 
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="overRepresentationAnalysis">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="entityType"          type="xsd:string" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="fsetType"            type="xsd:string" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="cpdbIdsFg"           type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+						<xsd:element name="cpdbIdsBg"           type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="accType"             type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="pThreshold"          type="xsd:float"  minOccurs="0" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="overRepresentationAnalysisResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="name"                    type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> 
+						<xsd:element name="details"                 type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    				    <xsd:element name="overlappingEntitiesNum"  type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="allEntitiesNum"          type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="pValue"                  type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+						<xsd:element name="qValue"                  type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="enrichmentAnalysis">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="entityType"          type="xsd:string" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="fsetType"            type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="cpdbIdsMeasurements" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+                        <xsd:element name="pThreshold"          type="xsd:float"  minOccurs="0" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="enrichmentAnalysisResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="name"                 type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> 
+                        <xsd:element name="details"              type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+    				    <xsd:element name="measuredEntitiesNum"  type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> 
+						<xsd:element name="allEntitiesNum"       type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> 
+						<xsd:element name="pValue"               type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+						<xsd:element name="qValue"               type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+            
+            <xsd:element name="getCpdbIdsInFset"> 
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="fsetId"               type="xsd:string" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="fsetType"             type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="entsetType"           type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element> 
+			
+			<xsd:element name="getCpdbIdsInFsetResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="cpdbIds"              type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+        
+        </xsd:schema>
+	</types>
+
+	<message name="getCpdbVersionRequest">
+		<part name="parameters" element="tns:getCpdbVersion"/>
+	</message>
+	
+	<message name="getCpdbVersionResponse">
+		<part name="return" element="tns:getCpdbVersionResponse"/>
+	</message>
+
+	<message name="getAvailableAccessionTypesRequest">
+		<part name="parameters" element="tns:getAvailableAccessionTypes"/>
+	</message>
+	
+	<message name="getAvailableAccessionTypesResponse">
+		<part name="return" element="tns:getAvailableAccessionTypesResponse"/>
+	</message>
+
+	<message name="mapAccessionNumbersRequest">
+		<part name="parameters" element="tns:mapAccessionNumbers"/>
+	</message>
+	
+	<message name="mapAccessionNumbersResponse">
+		<part name="return" element="tns:mapAccessionNumbersResponse"/>
+	</message>
+
+	<message name="getAvailableFsetTypesRequest">
+		<part name="parameters" element="tns:getAvailableFsetTypes"/>
+	</message>
+	
+	<message name="getAvailableFsetTypesResponse">
+		<part name="return" element="tns:getAvailableFsetTypesResponse"/>
+	</message>
+	
+    <message name="getDefaultBackgroundSizeRequest">
+		<part name="parameters" element="tns:getDefaultBackgroundSize"/>
+	</message>
+	<message name="getDefaultBackgroundSizeResponse">
+		<part name="return" element="tns:getDefaultBackgroundSizeResponse"/>
+	</message>
+    
+	<message name="overRepresentationAnalysisRequest">
+		<part name="parameters" element="tns:overRepresentationAnalysis"/>
+	</message>
+	<message name="overRepresentationAnalysisResponse">
+		<part name="return" element="tns:overRepresentationAnalysisResponse"/>
+	</message>
+
+	<message name="enrichmentAnalysisRequest">
+		<part name="parameters" element="tns:enrichmentAnalysis"/>
+	</message>
+	<message name="enrichmentAnalysisResponse">
+		<part name="return" element="tns:enrichmentAnalysisResponse"/>
+	</message>
+
+    <message name="getCpdbIdsInFsetRequest">
+		<part name="parameters" element="tns:getCpdbIdsInFset"/>
+	</message>
+	<message name="getCpdbIdsInFsetResponse">
+		<part name="return" element="tns:getCpdbIdsInFsetResponse"/>
+	</message>
+
+
+	<portType name="cpdb_portType">
+
+	    <operation name="getCpdbVersion">
+			<documentation>
+Provides the version of ConsensusPathDB which is the source for functional sets.
+			</documentation>
+			<input  name="getCpdbVersion_request" message="tns:getCpdbVersionRequest"/>
+			<output name="getCpdbVersion_response" message="tns:getCpdbVersionResponse"/>
+		</operation>
+        
+	    <operation name="getAvailableAccessionTypes">
+			<documentation>
+Provides a list of different types of accession numbers (e.g. 'uniprot') that are mappable to CPDB entity IDs.
+Parameter 'entityType' should be either 'genes' or 'metabolites'.
+			</documentation>
+			<input  name="getAvailableAccessionTypes_request" message="tns:getAvailableAccessionTypesRequest"/>
+			<output name="getAvailableAccessionTypes_response" message="tns:getAvailableAccessionTypesResponse"/>
+		</operation>
+
+        <operation name="mapAccessionNumbers">
+			<documentation>
+Maps accession numbers of a valid type to CPDB entity IDs.
+Parameter 'accType' is a valid accession number type (such as 'uniprot').
+Parameter 'accNumber' is a list og accession numbers.
+			</documentation>
+			<input  name="mapAccessionNumbers_request" message="tns:mapAccessionNumbersRequest"/>
+			<output name="mapAccessionNumbers_response" message="tns:mapAccessionNumbersResponse"/>
+		</operation>
+        
+        <operation name="getAvailableFsetTypes">
+			<documentation>
+Provides a list of available functional set types such as pathways, GO categories, NESTs, ...
+Parameter 'entityType' should be either 'genes' or 'metabolites'.
+			</documentation>
+			<input  name="getAvailableFsetTypes_request" message="tns:getAvailableFsetTypesRequest"/>
+			<output name="getAvailableFsetTypes_response" message="tns:getAvailableFsetTypesResponse"/>
+		</operation>
+
+		<operation name="getDefaultBackgroundSize">
+			<documentation>
+Provides the default background size for over-representation analysis. Note that it is accession number-specific.
+			</documentation>
+			<input  name="getDefaultBackgroundSize_request" message="tns:getDefaultBackgroundSizeRequest"/>
+			<output name="getDefaultBackgroundSize_response" message="tns:getDefaultBackgroundSizeResponse"/>
+		</operation>
+
+		<operation name="overRepresentationAnalysis">
+			<documentation>
+Performs over-representation analysis of functional sets with provided physical entities.
+Parameter 'entityType' should be either 'genes' or 'metabolites'.
+Parameter 'fsetType' is the type of the functional sets to be tested (as obtained with the getAvailableFsetTypes function; e.g. 'P' for pathways).
+Parameter 'cpdbIdsFg' is a list of interesting (e.g. differentially expressed) CPDB entity IDs (as obtained with the mapAccessionNumbers function).
+Parameter 'cpdbIdsBg' is a list of CPDB entity IDs in the background. If empty, the default background is used (all different entities present in at least one functional set of the type fsetType and identifiable with accession numbers of type 'accType').
+Parameter 'accType' is a valid accession number type. Should be specified if parameter 'cpdbIdsBg' is not set.
+Parameter 'pThreshold' is a p-value threshold, only sets with significant over-representation below or equal to this threshold will be provided.
+			</documentation>
+			<input  name="overRepresentationAnalysis_request" message="tns:overRepresentationAnalysisRequest"/>
+			<output name="overRepresentationAnalysis_response" message="tns:overRepresentationAnalysisResponse"/>
+		</operation>
+        
+		<operation name="enrichmentAnalysis">
+			<documentation>
+Performs Wilcoxon enrichment analysis of functional sets with provided physical entities.
+Parameter 'entityType' should be either 'genes' or 'metabolites'.
+Parameter 'cpdbIdsMeasurements' is a list of strings of the type "cpdbId m1 m2" where cpdbId is a CPDB entity ID, while m1 and m2 are two measured values (e.g. "entrez-gene:123 0.2 1.5"). Alternatively, only one value can be provided denoting e.g. a fold change.
+Parameter 'fsetType' is the type of the functional sets to be tested (as obtained with the getAvailableFsetTypes function; e.g. 'P' for pathways).
+Parameter 'pThreshold' is a p-value threshold, only sets with significant enrichment below or equal to this threshold will be provided.
+			</documentation>
+			<input  name="enrichmentAnalysis_request" message="tns:enrichmentAnalysisRequest"/>
+			<output name="enrichmentAnalysis_response" message="tns:enrichmentAnalysisResponse"/>
+		</operation>
+        
+        <operation name="getCpdbIdsInFset">
+			<documentation>
+Returns all CPDB entity IDs in a functional set. Note that functional sets of type 'N' (NESTs) are protected and cannot be retrieved.
+Parameter 'fsetId' is the ID of the functional set, parameter 'fsetType' is its type (e.g. 'P').
+			</documentation>
+			<input  name="getCpdbIdsInFset_request" message="tns:getCpdbIdsInFsetRequest"/>
+			<output name="getCpdbIdsInFset_response" message="tns:getCpdbIdsInFsetResponse"/>
+		</operation>
+	</portType>
+
+
+<!-- binding -->
+	<binding name="cpdb_http_binding" type="tns:cpdb_portType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		
+        <operation name="getCpdbVersion">
+			<soap:operation soapAction="cpdbns#getCpdbVersion"/>
+			<input name="getCpdbVersion_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="getCpdbVersion_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+        <operation name="getAvailableAccessionTypes">
+			<soap:operation soapAction="cpdbns#getAvailableAccessionTypes"/>
+			<input name="getAvailableAccessionTypes_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="getAvailableAccessionTypes_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+        <operation name="mapAccessionNumbers">
+			<soap:operation soapAction="cpdbns#mapAccessionNumbers"/>
+			<input name="mapAccessionNumbers_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="mapAccessionNumbers_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+		<operation name="getAvailableFsetTypes">
+			<soap:operation soapAction="cpdbns#getAvailableFsetTypes"/>
+			<input name="getAvailableFsetTypes_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="getAvailableFsetTypes_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+		<operation name="getDefaultBackgroundSize">
+			<soap:operation soapAction="cpdbns#getDefaultBackgroundSize"/>
+			<input name="getDefaultBackgroundSize_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="getDefaultBackgroundSize_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+                
+		<operation name="overRepresentationAnalysis">
+			<soap:operation soapAction="cpdbns#overRepresentationAnalysis"/>
+			<input name="overRepresentationAnalysis_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="overRepresentationAnalysis_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+
+		<operation name="enrichmentAnalysis">
+			<soap:operation soapAction="cpdbns#enrichmentAnalysis"/>
+			<input name="enrichmentAnalysis_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="enrichmentAnalysis_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+        <operation name="getCpdbIdsInFset">
+			<soap:operation soapAction="cpdbns#getCpdbIdsInFset"/>
+			<input name="getCpdbIdsInFset_request">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</input>
+			<output name="getCpdbIdsInFset_response">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</output>
+		</operation>
+        
+	</binding>
+
+
+<!-- service -->
+	<service name="cpdb">
+		<port name="cpdb_port" binding="tns:cpdb_http_binding">
+			<soap:address location="http://cpdb.molgen.mpg.de/ws2/" />
+		</port>
+	</service>
+</definitions>

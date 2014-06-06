@@ -244,7 +244,9 @@ public class PubMedFetcher {
         }
 
         PubMedRecord rec = new PubMedRecord();
-        rec.title = title.replace("\t", " ");
+        if (title != null) {
+            rec.title = title.replace("\t", " ");
+        }
         rec.abs = absStr.toString().replace("\t", " ");
         rec.yearCreated = year;
         rec.citation = citation;

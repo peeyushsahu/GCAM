@@ -29,8 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.axis2.AxisFault;
 import com.google.common.collect.Lists;
-import de.bonn.limes.gui.GeneMinerUI;
-import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
 
 /**
  *
@@ -46,7 +44,7 @@ public class AbstractReposite {
         this.Glist = GeneList;
         int count = 1;
         //GeneMinerUI progressB = new GeneMinerUI();
-        ProgressBar.setMaximum(Glist.size());
+        //ProgressBar.setMaximum(Glist.size());
         try {
             TreeMap<String, List> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
             List<PubMedAbstract> abstracts; // holds all PubMedAbstract object for gene list
@@ -58,9 +56,9 @@ public class AbstractReposite {
                     abstracts = new ArrayList<>();
                     System.out.println("Gene for abstract:  " + gene);
                     List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 3500);
-                    ProgressBar.setValue(count++);
-                    ProgressBar.repaint();
-                    System.out.println("This should be the progress:    "+ProgressBar.getValue());
+                    //ProgressBar.setValue(count++);
+                   //ProgressBar.repaint();
+                   //System.out.println("This should be the progress:    "+ProgressBar.getValue());
                     System.out.println("+++++++++++++++++++" + ids.isEmpty());
                     if (ids.get(0) != 0) {
                         System.out.println(ids);
@@ -120,7 +118,7 @@ public class AbstractReposite {
 
                 }
             }
-             ProgressBar.setValue(0);
+           // ProgressBar.setValue(0);
             return geneWidAbstract;
         } catch (AxisFault ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);

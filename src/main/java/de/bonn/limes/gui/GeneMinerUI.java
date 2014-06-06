@@ -23,6 +23,8 @@ import de.bonn.limes.core.ReadTextFile;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
 import de.bonn.limes.utils.Utility;
+import de.mpg.molgen.cpdb.EPathway;
+import de.mpg.molgen.cpdb.PathwayEnricher;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
@@ -60,11 +62,13 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
     private JTree tree;
     private List<String> queries = new ArrayList<>();
+    private List<String> all_genes = new ArrayList<>();
     private TreeMap<String, List> abstracts = new TreeMap<>();
     private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
     private File geneList;
     private List<String> entities2compare = new ArrayList<>();
     private ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
+    private ReadTextFile reader = new ReadTextFile();
 
     /**
      * Creates new form GeneMinerUI
@@ -91,18 +95,20 @@ public class GeneMinerUI extends javax.swing.JFrame {
         additionalQuery = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         fetchAbstracts = new javax.swing.JButton();
-        statusBar = new javax.swing.JLabel();
-        statusBar1 = new javax.swing.JLabel();
         abstractPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         abstractShow = new javax.swing.JEditorPane();
         ProgressBar = new javax.swing.JProgressBar();
+        statusBar = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         NerAnalysis = new javax.swing.JMenuItem();
-        OccurrenceAnalysis = new javax.swing.JMenuItem();
         HeatMap = new javax.swing.JMenuItem();
+        MenuPathway = new javax.swing.JMenuItem();
+        help = new javax.swing.JMenu();
+        about = new javax.swing.JMenuItem();
+        guide = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -124,6 +130,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
         queryPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         queryPanel.setFont(new java.awt.Font("DejaVu Sans Mono", 0, 15)); // NOI18N
 
+        inputFile.setText("path/to/geneList.csv");
+
         uploadFile.setText("File");
         uploadFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -144,10 +152,6 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         });
 
-        statusBar.setForeground(new java.awt.Color(3, 26, 249));
-
-        statusBar1.setForeground(new java.awt.Color(3, 26, 249));
-
         javax.swing.GroupLayout queryPanelLayout = new javax.swing.GroupLayout(queryPanel);
         queryPanel.setLayout(queryPanelLayout);
         queryPanelLayout.setHorizontalGroup(
@@ -163,13 +167,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     .addGroup(queryPanelLayout.createSequentialGroup()
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
-                                .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
-                                    .addComponent(statusBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(inputFile, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addComponent(inputFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(uploadFile, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
@@ -187,15 +188,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addComponent(additionalQuery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(queryPanelLayout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(fetchAbstracts))
-                    .addGroup(queryPanelLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(statusBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(fetchAbstracts)
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -209,19 +203,33 @@ public class GeneMinerUI extends javax.swing.JFrame {
         abstractShow.setPreferredSize(new java.awt.Dimension(100, 23));
         jScrollPane1.setViewportView(abstractShow);
 
+        ProgressBar.setIndeterminate(true);
+        ProgressBar.setString("");
+        ProgressBar.setStringPainted(true);
+        ProgressBar.setVerifyInputWhenFocusTarget(false);
+
+        statusBar.setForeground(new java.awt.Color(3, 26, 249));
+        statusBar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
         javax.swing.GroupLayout abstractPanelLayout = new javax.swing.GroupLayout(abstractPanel);
         abstractPanel.setLayout(abstractPanelLayout);
         abstractPanelLayout.setHorizontalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
-            .addComponent(ProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(abstractPanelLayout.createSequentialGroup()
+                .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         abstractPanelLayout.setVerticalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(abstractPanelLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -250,21 +258,13 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         jMenu2.setText("Analysis");
 
-        NerAnalysis.setText("NER");
+        NerAnalysis.setText("Named Entity Recignition");
         NerAnalysis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 NerAnalysisActionPerformed(evt);
             }
         });
         jMenu2.add(NerAnalysis);
-
-        OccurrenceAnalysis.setText("Occurrence analysis");
-        OccurrenceAnalysis.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                OccurrenceAnalysisActionPerformed(evt);
-            }
-        });
-        jMenu2.add(OccurrenceAnalysis);
 
         HeatMap.setText("EnrichmentAnalysis");
         HeatMap.addActionListener(new java.awt.event.ActionListener() {
@@ -274,7 +274,30 @@ public class GeneMinerUI extends javax.swing.JFrame {
         });
         jMenu2.add(HeatMap);
 
+        MenuPathway.setText("PathwayAnalysis");
+        MenuPathway.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuPathwayActionPerformed(evt);
+            }
+        });
+        jMenu2.add(MenuPathway);
+
         jMenuBar1.add(jMenu2);
+
+        help.setText("Help");
+
+        about.setText("About");
+        help.add(about);
+
+        guide.setText("Guide");
+        guide.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guideActionPerformed(evt);
+            }
+        });
+        help.add(guide);
+
+        jMenuBar1.add(help);
 
         setJMenuBar(jMenuBar1);
 
@@ -296,115 +319,116 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         // start NER process
         UITagger tagger = new UITagger();
-        tagger.setOperation(AbstractTagger.OPERATION.NER);
         tagger.execute();
-
-
     }//GEN-LAST:event_NerAnalysisActionPerformed
 
     class UITagger extends SwingWorker<Void, Void> {
 
-        private AbstractTagger.OPERATION operation;
         //private TreeMap<String, List> abstracts;
         /*
          public UITagger(TreeMap<String, List> abstracts) {
          this.abstracts = abstracts;
          }
          */
-
         @Override
         protected void done() {
-            statusBar.setText("NER analysis finished");
-            JOptionPane.showMessageDialog(null, "NER analysis finished");
+            ProgressBar.setVisible(false);
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-            statusBar.setText(null);
+            statusBar.setText("NER analysis started.");
+            ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
 
-                statusBar.setText("NER analysis started....");
+                AbstractTagger nerTagger = new AbstractTagger(abstracts);
+                abnerResults = nerTagger.tagAbstracts();
+                abstracts = nerTagger.getAbstracts();
 
-                switch (operation) {
-                    case COA:
+                /*
+                        
+                 for (PubMedAbstract a : res) {
+                 System.out.println("Tagged: " + a.getCompleteAbstract());
+                 }
+                 break;
+                 */
+            } else {
+            }
+            UIoccurrence occurrence = new UIoccurrence();
+            occurrence.execute();
+            return null;
 
-                    case NER:
-                        AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                        abnerResults = nerTagger.tagAbstracts();
-                        abstracts = nerTagger.getAbstracts();
-                        
-                    /*
-                        
-                     for (PubMedAbstract a : res) {
-                     System.out.println("Tagged: " + a.getCompleteAbstract());
-                     }
-                     break;
-                     */
+        }
+
+    }
+
+    class UIoccurrence extends SwingWorker<Void, Void> {
+
+        @Override
+        protected void done() {
+            ProgressBar.setVisible(false);
+            JOptionPane.showMessageDialog(null, "NER & Occurrence analysis finished");
+
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            statusBar.setText("Occurrence analysis started.");
+            ProgressBar.setVisible(true);
+            // step 5: Occurrence analysis of cell types in named entity
+            ReadTextFile cellEntity = new ReadTextFile();
+            entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
+            Entity2cell occurrenceTable = new Entity2cell();
+            occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
+
+            // This part writes output to a .csv format
+            BufferedWriter br = null;
+            try {
+                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult_2.csv"));
+                StringBuilder csvFile = new StringBuilder();
+
+                for (Occurrenceobj result : occurrenceResult) {
+                    TreeMap<String, Integer> cellnames = result.getOccurrence();
+                    for (Map.Entry<String, Integer> cells : cellnames.entrySet()) {
+                        csvFile.append(",");
+                        csvFile.append(cells.getKey());
+
+                    }
+                    csvFile.append("\n");
+                    break;
                 }
 
-            } else {
-                statusBar.setText("Error! No abstracts selected for analysis.");
+                for (Occurrenceobj result : occurrenceResult) {
+
+                    csvFile.append(result.getGene());
+                    System.out.println("Gene name before writing: " + result.getGene());
+                    TreeMap<String, Integer> occurre = result.getOccurrence();
+
+                    for (Map.Entry<String, Integer> entry : occurre.entrySet()) {
+                        csvFile.append(",");
+                        Integer cellcount = entry.getValue();
+                        csvFile.append(String.valueOf(cellcount));
+                    }
+
+                    csvFile.append("\n");
+                }
+                br.write(csvFile.toString());
+                br.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             return null;
 
         }
 
-        public void setOperation(AbstractTagger.OPERATION operation) {
-            this.operation = operation;
-        }
-
     }
 
-    private void OccurrenceAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OccurrenceAnalysisActionPerformed
-        BufferedWriter br = null;
-        try {
-            // step 5: Occurrence analysis of cell types in named entity
-            statusBar.setText("Occurrence analysis running....");
-            ReadTextFile cellEntity = new ReadTextFile();
-            entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
-            Entity2cell occurrenceTable = new Entity2cell();
-            occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
-            br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult_2.csv"));
-            StringBuilder csvFile = new StringBuilder();
-
-            for (Occurrenceobj result : occurrenceResult) {
-                TreeMap<String, Integer> cellnames = result.getOccurrence();
-                for (Map.Entry<String, Integer> cells : cellnames.entrySet()) {
-                    csvFile.append(",");
-                    csvFile.append(cells.getKey());
-
-                }
-                csvFile.append("\n");
-                break;
-            }
-
-            for (Occurrenceobj result : occurrenceResult) {
-
-                csvFile.append(result.getGene());
-                System.out.println("Gene name before writing: " + result.getGene());
-                TreeMap<String, Integer> occurre = result.getOccurrence();
-
-                for (Map.Entry<String, Integer> entry : occurre.entrySet()) {
-                    csvFile.append(",");
-                    Integer cellcount = entry.getValue();
-                    csvFile.append(String.valueOf(cellcount));
-                }
-
-                csvFile.append("\n");
-            }
-            br.write(csvFile.toString());
-            br.close();
-        } catch (IOException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                br.close();
-            } catch (IOException ex) {
-                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-    }//GEN-LAST:event_OccurrenceAnalysisActionPerformed
 
     private void fetchAbstractsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fetchAbstractsActionPerformed
 
@@ -414,22 +438,21 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
     class AbstractLoader extends SwingWorker<Void, Void> {
 
-        List<String> all_genes = new ArrayList<>();
-        ReadTextFile reader = new ReadTextFile();
         int totAbs;
 
         @Override
         protected void done() {
-            statusBar.setText("Abstracts download is finished, total genes:" + abstracts.size());
-            statusBar1.setText("Total number of abstractes:  " + totAbs);
-            JOptionPane.showMessageDialog(null, "Fetcher at rest");
+            ProgressBar.setVisible(false);
+            statusBar.setText("Total Abstracts: " + totAbs);
+            JOptionPane.showMessageDialog(null, "Fetch successful!");
+
         }
 
         @Override
         protected Void doInBackground() {
-            all_genes = reader.extract(geneList.getAbsolutePath());
+            statusBar.setText("Fetching started.");
+            ProgressBar.setVisible(true);
 
-            statusBar.setText("Fetching is started....");
             // step 2: get additional query words
             String additionalQ = additionalQuery.getText().trim();
             if (!additionalQ.isEmpty()) {
@@ -466,7 +489,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
             // step 3: fetch the abstracts and save
             AbstractReposite abstractFetcher = new AbstractReposite();
-            try {       
+            try {
                 System.err.println("Nothing is working");
                 abstracts = abstractFetcher.getAbstracts(queries);
                 System.out.println("Total abstracts: " + abstracts.size());
@@ -566,26 +589,36 @@ public class GeneMinerUI extends javax.swing.JFrame {
         geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
         if (geneList.exists()) {
             inputFile.setText(geneList.getAbsolutePath());
+            all_genes = reader.extract(geneList.getAbsolutePath());
+
         }
     }//GEN-LAST:event_uploadFileActionPerformed
 
     private void HeatMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HeatMapActionPerformed
-        /*
-         try {
-         SourcingRFile DoinR = new SourcingRFile();
-         DoinR.checkLocalRserve();
-         DoinR.analyse();
-         } catch (RserveException ex) {
-         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-         } catch (REXPMismatchException ex) {
-         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-         } catch (REngineException ex) {
-         Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         */
+
         enrichmentAnalysis performAnalysis = new enrichmentAnalysis();
         performAnalysis.runthis();
     }//GEN-LAST:event_HeatMapActionPerformed
+
+    private void guideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guideActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_guideActionPerformed
+
+    private void MenuPathwayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuPathwayActionPerformed
+
+        List<String> genes = all_genes;
+        System.out.println(genes.toString());
+        PathwayEnricher enricher = new PathwayEnricher(genes);
+        List<EPathway> ePathways = enricher.fetchEnrichedPathways();
+        if (!ePathways.isEmpty()) {
+            for (EPathway eP : ePathways) {
+                System.out.println("EPathway: " + eP.toString());
+            }
+        } else {
+            System.out.println("No pathways enriched.");
+        }
+
+    }//GEN-LAST:event_MenuPathwayActionPerformed
 
     /**
      * @param args the command line arguments
@@ -614,6 +647,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             public void run() {
                 GeneMinerUI ui = new GeneMinerUI();
                 ui.setVisible(true);
+                ProgressBar.setVisible(false);
                 GraphicsConfiguration gc = ui.getGraphicsConfiguration();
                 Rectangle bounds = gc.getBounds();
                 Dimension size = ui.getPreferredSize();
@@ -625,13 +659,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem HeatMap;
+    private javax.swing.JMenuItem MenuPathway;
     private javax.swing.JMenuItem NerAnalysis;
-    private javax.swing.JMenuItem OccurrenceAnalysis;
-    public static javax.swing.JProgressBar ProgressBar;
+    private static javax.swing.JProgressBar ProgressBar;
+    private javax.swing.JMenuItem about;
     private javax.swing.JPanel abstractPanel;
     private javax.swing.JEditorPane abstractShow;
     private javax.swing.JTextField additionalQuery;
     private javax.swing.JButton fetchAbstracts;
+    private javax.swing.JMenuItem guide;
+    private javax.swing.JMenu help;
     private javax.swing.JTextField inputFile;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -643,7 +680,6 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JPanel queryPanel;
     private javax.swing.JPanel resultPanel;
     private javax.swing.JLabel statusBar;
-    private javax.swing.JLabel statusBar1;
     private javax.swing.JButton uploadFile;
     // End of variables declaration//GEN-END:variables
 }

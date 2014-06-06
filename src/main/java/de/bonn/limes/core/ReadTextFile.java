@@ -33,23 +33,26 @@ import java.util.List;
 public class ReadTextFile {
 
     List<String> entityNames = new ArrayList();
-    String csvFile="";
+    String fileName;
+    List<List<String>> synonymList = new ArrayList<>();
+    List<String> synonymes;
 
-    /*
+    /**
      * This method will read text file 
      * Any text file can be used after defining the delimiter
-     * Return arraylist
+     * @param path
+     * @return 
      */
     public List extract(String path) {
 
-        this.csvFile = path;
-        BufferedReader br = null;
-        String line = "";
+        this.fileName = path;
+        BufferedReader br;
+        String line;
         String delimiter = "\n";
 
         try {
 
-            br = new BufferedReader(new FileReader(csvFile));
+            br = new BufferedReader(new FileReader(fileName));
             while ((line = br.readLine()) != null) {
 
                 // use comma seprated file to retrieve text
@@ -65,10 +68,57 @@ public class ReadTextFile {
         }
         return null;
     }
+    
+    /**
+     * This method is to read synonym file
+     * @param path
+     * @param delim
+     * @return 
+     */
+    
+    public List extract(String path, String delim) { // it is delimeter for gene and synonyms prefrable is comma(",")
 
-    //public static void main(String args[]) {
+        this.fileName = path;
+        BufferedReader br;
+        String line;
+        String newLineDelimiter = "\n";
+        String listDelimiter = delim;
 
-      //  ReadTextFile Fread = new ReadTextFile();
-      //  System.out.println(Fread.extract());
-    //}
+        try {
+
+            br = new BufferedReader(new FileReader(fileName));
+            while ((line = br.readLine()) != null) {
+                // use comma seprated file to retrieve text
+                String[] Sline = line.split(newLineDelimiter); 
+                String[] synonym = Sline[0].split(listDelimiter);
+                synonymes = new ArrayList<>();
+                for(String aliase:synonym){
+                    if(!aliase.equals("0")){
+                   synonymes.add(aliase);
+                    }
+                }
+               synonymList.add(synonymes);
+            }
+            return synonymList;
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found");
+        } catch (IOException e) {
+            System.err.println("Input output exception");
+        }
+        return null;
+    }
+   /*
+    public static void main(String args[]) {
+
+        ReadTextFile Fread = new ReadTextFile();
+        List<List<String>> names;
+        names = (List<List<String>>) Fread.extract("/home/peeyush/Desktop/testFile.csv",",");
+        for(List<String> name:names){
+            System.out.println("Length of big list"+names.size());
+            System.out.println("String: "+name);
+            System.out.println("length: "+name.size());
+        }
+
+    }    
+    */
 }

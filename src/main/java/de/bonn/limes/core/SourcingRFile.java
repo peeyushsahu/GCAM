@@ -67,7 +67,7 @@ public class SourcingRFile {
 	}
             
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException{
-        public void analyse(Double threshold) throws RserveException, REXPMismatchException, REngineException {       
+        public void analyse(float threshold) throws RserveException, REXPMismatchException, REngineException {       
 
                 
                 checkLocalRserve();

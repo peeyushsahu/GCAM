@@ -39,19 +39,6 @@ import java.util.logging.Logger;
  *
  */
 public class AbstractTagger {
-    
-    
-    public static enum OPERATION {
-
-        /**
-         * Named Entity Recognition
-         */
-        NER,
-        /**
-         * Co-occurrence Analysis
-         */
-        COA;
-    }
 
     private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
     private TreeMap<String, List> abstracts;
