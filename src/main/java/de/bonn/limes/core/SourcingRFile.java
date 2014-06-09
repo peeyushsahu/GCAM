@@ -67,10 +67,11 @@ public class SourcingRFile {
 	}
             
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException{
-        public void analyse(float threshold) throws RserveException, REXPMismatchException, REngineException {       
-
-                
-                checkLocalRserve();
+        public void analyse(float threshold,int synonym) throws RserveException, REXPMismatchException, REngineException {       
+                //int synonym = 0;
+                //float threshold = (float) 0.2;
+                SourcingRFile sr = new SourcingRFile();
+                sr.checkLocalRserve();
                 RConnection c = new RConnection();
                 // source the Palindrom function
                       
@@ -82,12 +83,13 @@ public class SourcingRFile {
                 else { 
                 
                 c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
+                    System.out.println("Script is compiling....");
                 // call the function. Return true
-                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/firstResult.csv',"+threshold+")");
+                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/',"+threshold+","+synonym+")");
                 System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 
-                
+                System.out.println("Rserver shutting down....");
                 c.shutdown();
        
             }

@@ -16,9 +16,7 @@
  */
 package de.mpg.molgen.cpdb;
 
-import de.mpg.molgen.cpdb.EPathway;
-import de.mpg.molgen.cpdb.Cpdb;
-import de.mpg.molgen.cpdb.CpdbPortType;
+import de.bonn.limes.core.ReadTextFile;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.ws.Holder;
@@ -67,8 +65,11 @@ public class PathwayEnricher {
         List<EPathway> ePathways = new ArrayList<>();
         try {
             cpdbPort.mapAccessionNumbers(accType, inputGenes, new Holder<>(inputGenes), holderFg);
+            System.out.println("Mapped Genes" + holderFg.toString());
+            System.out.println(cpdbPort.getCpdbVersion());
             cpdbPort.overRepresentationAnalysis(entityType, fsetType, holderFg.value, holderBg.value, accType, pValue, holderPNames, holderPDesc, holderOEnt, holderAEnt, holderPValues, holderQValues);
-            System.out.println("holderPNames.value.size()"+holderPNames.value.size());
+            System.out.println("OR Analysis started");
+            System.out.println("holderPNames.value.size()" + holderPNames.value.size());
             for (int i = 0; i < holderPNames.value.size(); i++) {
 
                 EPathway eP = new EPathway();
@@ -146,6 +147,15 @@ public class PathwayEnricher {
             return reactomeId;
         }
 
+    }
+
+    public static void main(String[] args) {
+       
+        ReadTextFile reader = new ReadTextFile();
+        List<String> gList = reader.extract("/home/peeyush/Desktop/APP.csv");
+        PathwayEnricher enricher = new PathwayEnricher(gList);
+        List<EPathway> ePaths = enricher.fetchEnrichedPathways();
+        System.out.println("Total pathways enriched: "+ePaths.size());
     }
 
 }

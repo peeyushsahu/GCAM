@@ -20,6 +20,7 @@ package de.bonn.limes.core;
 import abner.Tagger;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.EntityTaged;
+import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,8 +58,7 @@ public class AbnerAnalysis {
     ArrayList <String> entity;
     String gene;
     EntityTaged test;    
-    
-    
+        int count = 1;
         for(Map.Entry<String, ArrayList> entry : abstractList.entrySet()){
             
             NerResultList = new ArrayList();
@@ -67,6 +67,8 @@ public class AbnerAnalysis {
             System.out.println("Abstract size:  "+abstracts.size());
             
             for (PubMedAbstract iter :abstracts) {
+                ProgressBar.setValue(count++);
+                ProgressBar.repaint();
                 NERentity = new EntityTaged();
                 entity = new ArrayList();
                 String s = iter.getAbstractText();

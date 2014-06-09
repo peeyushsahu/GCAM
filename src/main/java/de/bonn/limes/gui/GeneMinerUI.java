@@ -62,6 +62,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class GeneMinerUI extends javax.swing.JFrame {
 
     private JTree tree;
+    private int totAbs;
     private List<String> queries = new ArrayList<>();
     private List<String> all_genes = new ArrayList<>();
     private List<String> new_all_genes = new ArrayList<>();
@@ -141,13 +142,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
         abstractShow.setPreferredSize(new java.awt.Dimension(100, 23));
         jScrollPane1.setViewportView(abstractShow);
 
-        ProgressBar.setIndeterminate(true);
         ProgressBar.setString("");
         ProgressBar.setStringPainted(true);
         ProgressBar.setVerifyInputWhenFocusTarget(false);
 
         statusBar.setForeground(new java.awt.Color(3, 26, 249));
-        statusBar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        statusBar.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
 
         javax.swing.GroupLayout abstractPanelLayout = new javax.swing.GroupLayout(abstractPanel);
         abstractPanel.setLayout(abstractPanelLayout);
@@ -320,6 +320,46 @@ public class GeneMinerUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    private void WriteSynonyms(){
+        
+        BufferedWriter br = null;
+            try {
+                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/synonymList.csv"));
+                StringBuilder csvFile = new StringBuilder();
+
+                for (String gene : all_genes){
+                    csvFile.append(gene);
+                    System.out.println("Gene:   "+gene);
+                    for(List eliaseList:synonyms){
+                        List<String> geneList = eliaseList;
+                       for(String eliase:geneList){
+                            if(gene.toLowerCase().equals(eliase.toLowerCase())){
+                                for(String elias:geneList){
+                                    csvFile.append(",");
+                                    csvFile.append(elias);                                    
+                                }
+                                csvFile.append("\n");
+                                break; 
+                            }
+
+                        }                
+                    }
+                }
+                br.write(csvFile.toString());
+                br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        br.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+        
+                }
+        }
+    
     private void NerAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NerAnalysisActionPerformed
 
         // start NER process
@@ -340,6 +380,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         @Override
         protected Void doInBackground() throws Exception {
             statusBar.setText("NER analysis started.");
+            ProgressBar.setMaximum(totAbs);
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
 
@@ -380,11 +421,14 @@ public class GeneMinerUI extends javax.swing.JFrame {
             entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
             Entity2cell occurrenceTable = new Entity2cell();
             occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
+            ProgressBar.setValue(0);
+            //writing gene with synonyms
+            WriteSynonyms();
 
             // This part writes output to a .csv format
             BufferedWriter br = null;
             try {
-                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult_2.csv"));
+                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult.csv"));
                 StringBuilder csvFile = new StringBuilder();
 
                 for (Occurrenceobj result : occurrenceResult) {
@@ -437,9 +481,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }//GEN-LAST:event_fetchAbstractsActionPerformed
 
     class AbstractLoader extends SwingWorker<Void, Void> {
-
-        int totAbs;
-
+        
         @Override
         protected void done() {
             ProgressBar.setVisible(false);
@@ -599,8 +641,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
         if (geneList.exists()) {
             inputFile.setText(geneList.getAbsolutePath());
-            all_genes = reader.extract(geneList.getAbsolutePath());      
-
+            all_genes = reader.extract(geneList.getAbsolutePath());
         }
     }//GEN-LAST:event_uploadFileActionPerformed
 
@@ -671,7 +712,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem HeatMap;
     private javax.swing.JMenuItem MenuPathway;
     private javax.swing.JMenuItem NerAnalysis;
-    private static javax.swing.JProgressBar ProgressBar;
+    public static javax.swing.JProgressBar ProgressBar;
     private javax.swing.JMenuItem about;
     private javax.swing.JPanel abstractPanel;
     private javax.swing.JEditorPane abstractShow;

@@ -28,13 +28,11 @@ public class CheckSynonymes {
     
     private List<String> genes;
     private List<String> geneWidSynonym;
-    private ReadTextFile reader;
     private List<List<String>> synonyms;
 
     public CheckSynonymes(List allGenes) {
         this.geneWidSynonym = new ArrayList();
-        this.reader = new ReadTextFile();
-        this.genes=allGenes;
+        this.genes = allGenes;
     }
     
     public List withSynonym(List synonym){
@@ -47,6 +45,7 @@ public class CheckSynonymes {
                     if(gene.toLowerCase().equals(eliase.toLowerCase())){
                         System.out.println("elisase:"+eliase);
                         for(String elias:geneList){
+                            System.out.println("elias:"+elias);
                             geneWidSynonym.add(elias);
                         }
                         System.out.println("size of aliase list:"+geneList.size());
