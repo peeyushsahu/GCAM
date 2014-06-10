@@ -145,16 +145,17 @@ public class enrichmentAnalysis extends javax.swing.JFrame {
             DoinR.analyse(threshold,synonym);
             this.dispose();
             
-          } catch (RserveException ex) {
+        } catch (RserveException ex) {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (REXPMismatchException | REngineException ex) {
             Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(enrichmentAnalysis.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }//GEN-LAST:event_analyseActionPerformed
 
     /**
-     * @param args the command line arguments
      */
     public void runthis() {
          /* Set the SeaGlass look and feel */
@@ -177,6 +178,7 @@ public class enrichmentAnalysis extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 //new enrichmentAnalysis().setVisible(true);
                 enrichmentAnalysis ui = new enrichmentAnalysis();

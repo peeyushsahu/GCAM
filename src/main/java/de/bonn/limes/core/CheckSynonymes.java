@@ -49,7 +49,7 @@ public class CheckSynonymes {
                             geneWidSynonym.add(elias);
                         }
                         System.out.println("size of aliase list:"+geneList.size());
-                        break; 
+                        //break; 
                     }
                     
                 }                

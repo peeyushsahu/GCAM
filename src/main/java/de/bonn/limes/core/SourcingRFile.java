@@ -23,7 +23,9 @@ package de.bonn.limes.core;
  */
 import static de.bonn.limes.core.StartRserve.isRserveRunning;
 import static de.bonn.limes.core.StartRserve.launchRserve;
+import static de.bonn.limes.gui.GeneMinerUI.homePath;
 import java.io.File;
+import java.io.IOException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -32,7 +34,8 @@ import org.rosuda.REngine.Rserve.RserveException;
  
 public class SourcingRFile {
     
-    /** checks whether Rserve is running and if that's not the case it attempts to start it using the defaults for the platform where it is run on. This method is meant to be set-and-forget and cover most default setups. For special setups you may get more control over R with <<code>launchRserve</code> instead. */
+    /** checks whether Rserve is running and if that's not the case it attempts to start it using the defaults for the platform where it is run on. This method is meant to be set-and-forget and cover most default setups. For special setups you may get more control over R with <<code>launchRserve</code> instead.
+     * @return  */
 	public boolean checkLocalRserve() {
 		if (isRserveRunning()) return true;
 		String osname = System.getProperty("os.name");
@@ -45,7 +48,7 @@ public class SourcingRFile {
 				rp.waitFor();
 				regHog.join();
 				installPath = regHog.getInstallPath();
-			} catch (Exception rge) {
+			} catch (IOException | InterruptedException rge) {
 				System.out.println("ERROR: unable to run REG to find the location of R: "+rge);
 				return false;
 			}
@@ -66,27 +69,26 @@ public class SourcingRFile {
 			);
 	}
             
-        //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException{
-        public void analyse(float threshold,int synonym) throws RserveException, REXPMismatchException, REngineException {       
-                //int synonym = 0;
+        //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException, InterruptedException{
+        public void analyse(float threshold,int synonym) throws RserveException, REXPMismatchException, REngineException, InterruptedException {       
+                //int synonym = 1;
                 //float threshold = (float) 0.2;
+                //homePath = "/home/peeyush/GeneMiner_output";
                 SourcingRFile sr = new SourcingRFile();
                 sr.checkLocalRserve();
-                RConnection c = new RConnection();
-                // source the Palindrom function
-                      
-                //c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
-                
+                RConnection c = new RConnection();                
                 c.assign(".tmp.", "source(\"/home/peeyush/Desktop/palindrome.R\")");
                 REXP r = c.parseAndEval("try(eval(parse(text=.tmp.)),silent=TRUE)");
                 if (r.inherits("try-error")) System.err.println("Error: "+r.toString());
-                else { 
-                
-                c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
+                else {                 
+                    c.parseAndEval("source(\"/home/peeyush/Desktop/palindrome.R\")");
                     System.out.println("Script is compiling....");
-                // call the function. Return true
-                REXP generate_heatmap_pVal = c.parseAndEval("palindrome('/home/peeyush/Desktop/',"+threshold+","+synonym+")");
-                System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
+                    Thread.sleep(1000);
+                    // call the function. Return true
+                    String path = "palindrome(\""+homePath+"\","+threshold+","+synonym+")";
+                    System.out.println(path);
+                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\","+threshold+","+synonym+")");
+                    System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 
                 System.out.println("Rserver shutting down....");

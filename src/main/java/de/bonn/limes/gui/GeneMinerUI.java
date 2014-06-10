@@ -20,6 +20,7 @@ import de.bonn.limes.core.AbstractReposite;
 import de.bonn.limes.core.AbstractTagger;
 import de.bonn.limes.core.CheckSynonymes;
 import de.bonn.limes.core.Entity2cell;
+import de.bonn.limes.core.FindDirectoryAddress;
 import de.bonn.limes.core.ReadTextFile;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
@@ -67,12 +68,14 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private List<String> all_genes = new ArrayList<>();
     private List<String> new_all_genes = new ArrayList<>();
     private TreeMap<String, List> abstracts = new TreeMap<>();
-    private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
+    private TreeMap<String, ArrayList> abnerResults;
     private File geneList;
     private List<String> entities2compare = new ArrayList<>();
     private ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
     private ReadTextFile reader = new ReadTextFile();
     private List<List<String>> synonyms = new ArrayList<>();
+    public static String dirPath;
+    public static String homePath;
 
     /**
      * Creates new form GeneMinerUI
@@ -105,6 +108,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         fetchAbstracts = new javax.swing.JButton();
         synonymCheck = new javax.swing.JCheckBox();
+        synonymHuman = new javax.swing.JRadioButton();
+        synonymMouse = new javax.swing.JRadioButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -192,7 +197,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         });
 
-        synonymCheck.setText("Add synonyms for genes");
+        synonymCheck.setText("Add synonyms for");
+
+        synonymHuman.setText("Human OR");
+
+        synonymMouse.setText("Mouse");
 
         javax.swing.GroupLayout queryPanelLayout = new javax.swing.GroupLayout(queryPanel);
         queryPanel.setLayout(queryPanelLayout);
@@ -210,6 +219,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
                                 .addComponent(synonymCheck)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(synonymHuman)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(synonymMouse)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -234,7 +247,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fetchAbstracts)
-                    .addComponent(synonymCheck))
+                    .addComponent(synonymCheck)
+                    .addComponent(synonymHuman)
+                    .addComponent(synonymMouse))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -320,12 +335,14 @@ public class GeneMinerUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
+    /**
+     * this method writes synonym for query genes
+     */
     private void WriteSynonyms(){
         
         BufferedWriter br = null;
             try {
-                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/synonymList.csv"));
+                br = new BufferedWriter(new FileWriter(homePath+"/synonymList.csv"));
                 StringBuilder csvFile = new StringBuilder();
 
                 for (String gene : all_genes){
@@ -336,15 +353,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
                        for(String eliase:geneList){
                             if(gene.toLowerCase().equals(eliase.toLowerCase())){
                                 for(String elias:geneList){
-                                    csvFile.append(",");
-                                    csvFile.append(elias);                                    
-                                }
-                                csvFile.append("\n");
-                                break; 
-                            }
-
-                        }                
+                                    if(!elias.toLowerCase().equals(gene.toLowerCase())){
+                                        csvFile.append(",");
+                                        csvFile.append(elias);
+                                    }
+                                }                                
+                                //break; 
+                            }                            
+                        }                       
                     }
+                    csvFile.append("\n");
                 }
                 br.write(csvFile.toString());
                 br.close();
@@ -383,7 +401,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             ProgressBar.setMaximum(totAbs);
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
-
+                abnerResults = new TreeMap<>();
                 AbstractTagger nerTagger = new AbstractTagger(abstracts);
                 abnerResults = nerTagger.tagAbstracts();
                 abstracts = nerTagger.getAbstracts();
@@ -428,7 +446,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             // This part writes output to a .csv format
             BufferedWriter br = null;
             try {
-                br = new BufferedWriter(new FileWriter("/home/peeyush/Desktop/firstResult.csv"));
+                br = new BufferedWriter(new FileWriter(homePath+"/firstResult.csv"));
                 StringBuilder csvFile = new StringBuilder();
 
                 for (Occurrenceobj result : occurrenceResult) {
@@ -498,11 +516,18 @@ public class GeneMinerUI extends javax.swing.JFrame {
             //check for synonyms
             if(synonymCheck.isSelected()){
                 System.out.println("Synonyms are being considered");
-                synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/HSA_gene_synonym.csv", ",");
-                CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
-                new_all_genes = cSynonym.withSynonym(synonyms);
-                System.out.println("Size of synonym list:   "+new_all_genes.size());
-                
+                if(synonymHuman.isSelected()){
+                    synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/Human_synonym.csv", ",");
+                    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                    new_all_genes = cSynonym.withSynonym(synonyms);
+                    System.out.println("Size of Human synonym list:   "+new_all_genes.size());
+                }
+                if(synonymMouse.isSelected()){
+                    synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/Mouse_synonym.csv", ",");
+                    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                    new_all_genes = cSynonym.withSynonym(synonyms);
+                    System.out.println("Size of Mouse synonym list:   "+new_all_genes.size());  
+                }
             }
             
             // step 2: get additional query words
@@ -638,9 +663,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }
 
     private void uploadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadFileActionPerformed
+        
         geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
         if (geneList.exists()) {
             inputFile.setText(geneList.getAbsolutePath());
+            FindDirectoryAddress createDir = new FindDirectoryAddress();
+            createDir.getpath();
             all_genes = reader.extract(geneList.getAbsolutePath());
         }
     }//GEN-LAST:event_uploadFileActionPerformed
@@ -732,6 +760,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JPanel resultPanel;
     private javax.swing.JLabel statusBar;
     private javax.swing.JCheckBox synonymCheck;
+    private javax.swing.JRadioButton synonymHuman;
+    private javax.swing.JRadioButton synonymMouse;
     private javax.swing.JButton uploadFile;
     // End of variables declaration//GEN-END:variables
 }

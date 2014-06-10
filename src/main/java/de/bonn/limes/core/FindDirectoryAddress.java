@@ -17,6 +17,10 @@
 
 package de.bonn.limes.core;
 
+import static de.bonn.limes.gui.GeneMinerUI.dirPath;
+import static de.bonn.limes.gui.GeneMinerUI.homePath;
+import java.io.File;
+
 /**
  *
  * @author peeyush
@@ -27,9 +31,17 @@ public class FindDirectoryAddress {
   * This returns the current working directory
   * @return 
   */
- public String getpath(){
-    String dir = System.getProperty("user.dir");
-    System.out.println("current dir = " + dir);
-     return dir;
+ public void getpath(){
+    dirPath = System.getProperty("user.dir");
+    System.out.println("dirPath directory=  "+dirPath);
+    String home = System.getProperty("user.home");
+    boolean success = (new File(home+"/GeneMiner_output")).mkdir();
+    homePath = new StringBuilder().append(home).append("/GeneMiner_output").toString();
+    System.out.println("Home directory=  "+homePath);
+    System.out.println("Directory created: "+success);
  }
+    //public static void main(String[] args) {
+        //FindDirectoryAddress hs = new FindDirectoryAddress();
+        //hs.getpath();
+    //}
 }

@@ -254,6 +254,10 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="synonymCheck" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="synonymHuman" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="synonymMouse" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
                                       <Component id="fetchAbstracts" min="-2" max="-2" attributes="0"/>
                                   </Group>
@@ -286,6 +290,8 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="fetchAbstracts" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="synonymCheck" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="synonymHuman" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="synonymMouse" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
@@ -334,7 +340,17 @@
             </Component>
             <Component class="javax.swing.JCheckBox" name="synonymCheck">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Add synonyms for genes"/>
+                <Property name="text" type="java.lang.String" value="Add synonyms for"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="synonymHuman">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Human OR"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="synonymMouse">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Mouse"/>
               </Properties>
             </Component>
           </SubComponents>

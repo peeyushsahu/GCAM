@@ -55,7 +55,7 @@ public class AbstractReposite {
                     System.out.println("this is the count for progress bar: "+count);
                     abstracts = new ArrayList<>();
                     System.out.println("Gene for abstract:  " + gene);
-                    List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 3500);
+                    List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 20);
                     ProgressBar.setValue(count++);
                     ProgressBar.repaint();
                    //System.out.println("This should be the progress:    "+ProgressBar.getValue());
@@ -64,7 +64,7 @@ public class AbstractReposite {
                         System.out.println(ids);
 
                         // if PMID list has less than 50 ids
-                        if (ids.size() < 500) {
+                        if (ids.size() < 10) {
                             List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(ids);
                             if (records == null) {
                                 System.out.println("No abstract to show..");
@@ -86,7 +86,7 @@ public class AbstractReposite {
                         } // if
                         else {
                             int countabst = 0;
-                            List<List<Integer>> parts = Lists.partition(ids, 500);
+                            List<List<Integer>> parts = Lists.partition(ids, 10);
                             for (List<Integer> Slist : parts) {
 
                                 System.out.println(Slist.size());
