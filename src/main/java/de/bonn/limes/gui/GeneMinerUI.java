@@ -151,16 +151,20 @@ public class GeneMinerUI extends javax.swing.JFrame {
         ProgressBar.setStringPainted(true);
         ProgressBar.setVerifyInputWhenFocusTarget(false);
 
-        statusBar.setForeground(new java.awt.Color(3, 26, 249));
+        statusBar.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
+        statusBar.setForeground(new java.awt.Color(253, 6, 21));
         statusBar.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        statusBar.setToolTipText("");
 
         javax.swing.GroupLayout abstractPanelLayout = new javax.swing.GroupLayout(abstractPanel);
         abstractPanel.setLayout(abstractPanelLayout);
         abstractPanelLayout.setHorizontalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
-            .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(ProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(abstractPanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         abstractPanelLayout.setVerticalGroup(
             abstractPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -397,7 +401,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() throws Exception {
-            statusBar.setText("NER analysis started.");
+            statusBar.setText("NER & occurrence analysis running.....");
             ProgressBar.setMaximum(totAbs);
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
@@ -432,7 +436,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() throws Exception {
-            statusBar.setText("Occurrence analysis started.");
+            //statusBar.setText("Occurrence analysis started.");
             ProgressBar.setVisible(true);
             // step 5: Occurrence analysis of cell types in named entity
             ReadTextFile cellEntity = new ReadTextFile();
@@ -510,7 +514,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
-            statusBar.setText("Fetching started....");
+            statusBar.setText("Downloading abstracts....");
             ProgressBar.setVisible(true);
             
             //check for synonyms
@@ -528,6 +532,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     new_all_genes = cSynonym.withSynonym(synonyms);
                     System.out.println("Size of Mouse synonym list:   "+new_all_genes.size());  
                 }
+            }
+            else{
+                new_all_genes = reader.extract(geneList.getAbsolutePath());
             }
             
             // step 2: get additional query words
@@ -593,10 +600,13 @@ public class GeneMinerUI extends javax.swing.JFrame {
             root.add(parentChild);
 
             ArrayList<PubMedAbstract> objAbs = (ArrayList<PubMedAbstract>) abs.getValue();
-            for (PubMedAbstract abst : objAbs) {
+            int NoAbstracts = 0;
+            for (PubMedAbstract abst : objAbs) { //this will form tree for only 10 abstract per gene in GUI
+                NoAbstracts++;
                 absCount++;
                 DefaultMutableTreeNode child = new DefaultMutableTreeNode("PMID:" + abst.getPMID());
                 parentChild.add(child);
+                if(NoAbstracts == 10)break;
             }
         }
         tree = new JTree(root);

@@ -55,17 +55,20 @@ public class AbstractReposite {
                     System.out.println("this is the count for progress bar: "+count);
                     abstracts = new ArrayList<>();
                     System.out.println("Gene for abstract:  " + gene);
-                    List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 20);
+                    //List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 500);
+                    List<Integer> ids = new PubmedSearch().getPubMedIDs(gene);
+                    //System.out.println("Size of fetched PMID list"+ids.size());
                     ProgressBar.setValue(count++);
                     ProgressBar.repaint();
                    //System.out.println("This should be the progress:    "+ProgressBar.getValue());
-                    System.out.println("+++++++++++++++++++" + ids.isEmpty());
+                    System.out.println("Are there no abstracts for gene:    " + ids.isEmpty());
                     if (ids.get(0) != 0) {
-                        System.out.println(ids);
+                        //System.out.println(ids);
 
                         // if PMID list has less than 50 ids
-                        if (ids.size() < 10) {
+                        if (ids.size() < 50) {
                             List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(ids);
+                            System.out.println("Size of fetched PMID list"+records.size());
                             if (records == null) {
                                 System.out.println("No abstract to show..");
                             }
@@ -86,15 +89,16 @@ public class AbstractReposite {
                         } // if
                         else {
                             int countabst = 0;
-                            List<List<Integer>> parts = Lists.partition(ids, 10);
+                            List<List<Integer>> parts = Lists.partition(ids, 100);
                             for (List<Integer> Slist : parts) {
 
-                                System.out.println(Slist.size());
+                                //System.out.println("Downloaded abstracts:"+Slist.size());
                                 List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(Slist);
+                                 System.out.println("Size of fetched PMID list"+records.size());
                                 //System.out.println(gene);
                                 if (!records.isEmpty()) {
                                     countabst++;
-                                    System.out.println("For " + gene + " number of abstracts Fetched:   " + countabst * 500);
+                                    System.out.println("For "+gene +" Number of abstracts Fetched:   " + countabst * 500);
 
                                     for (PubMedRecord record : records) {
 

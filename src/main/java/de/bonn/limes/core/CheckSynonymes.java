@@ -38,12 +38,14 @@ public class CheckSynonymes {
     public List withSynonym(List synonym){
         this.synonyms = synonym;
         for(String gene:genes){
+            int count = 0;
             System.out.println("Gene:"+gene);
             for(List eliaseList:synonyms){
                 List<String> geneList = eliaseList;
                for(String eliase:geneList){
                     if(gene.toLowerCase().equals(eliase.toLowerCase())){
                         System.out.println("elisase:"+eliase);
+                        count++;
                         for(String elias:geneList){
                             System.out.println("elias:"+elias);
                             geneWidSynonym.add(elias);
@@ -53,6 +55,10 @@ public class CheckSynonymes {
                     }
                     
                 }                
+            }
+            if(count == 0){
+                geneWidSynonym.add(gene);
+                System.out.println("This has no synonym"+gene);
             }
         }
         return geneWidSynonym;

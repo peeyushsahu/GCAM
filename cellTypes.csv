@@ -20,6 +20,10 @@ Claudius
 Boettcher
 plexus
 endometrium
+hematopoetic stem cell
+stem cell
+embryonic stem cell
+endothelial cell
 ependymal
 nerve cell
 ameloblast
@@ -38,8 +42,6 @@ hyalocyte
 vitreous
 stellate
 satellite
-stem cell
-embryonic stem cell
 ordinary
 Purkinje
 myoepithelial
@@ -48,13 +50,13 @@ macrophage
 monocyte
 Langerhans
 osteoclast
-dendritic
+dendritic cell
 microglial
+granulocyte
 neutrophil
 eosinophil
 basophil
 mast cell
-lymphocyte
 B lymphocyte
 T lymphocyte
 B cell
@@ -63,10 +65,13 @@ IgM
 IgG
 IgA
 IgE
-killer cell
+Natural killer cell
 NKC
+NK cell
+platelet
 Merkel
 epidermis
+erythrocyte
 sensory
 neuron
 pillar
