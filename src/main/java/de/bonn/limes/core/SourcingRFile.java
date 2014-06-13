@@ -70,7 +70,7 @@ public class SourcingRFile {
 	}
             
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException, InterruptedException{
-        public void analyse(float threshold,int synonym) throws RserveException, REXPMismatchException, REngineException, InterruptedException {       
+        public void analyse(float Pthreshold,float Ethreshold,int synonym,String test) throws RserveException, REXPMismatchException, REngineException, InterruptedException {       
                 //int synonym = 1;
                 //float threshold = (float) 0.2;
                 //homePath = "/home/peeyush/GeneMiner_output";
@@ -85,9 +85,9 @@ public class SourcingRFile {
                     System.out.println("Script is compiling....");
                     Thread.sleep(1000);
                     // call the function. Return true
-                    String path = "palindrome(\""+homePath+"\","+threshold+","+synonym+")";
+                    String path = "palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+","+test+")";
                     System.out.println(path);
-                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\","+threshold+","+synonym+")");
+                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+","+test+")");
                     System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 

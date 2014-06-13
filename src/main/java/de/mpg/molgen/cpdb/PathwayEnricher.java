@@ -33,7 +33,7 @@ public class PathwayEnricher {
     private final String entityType = "genes";
     private final String fsetType = "P";
     private final String accType = "hgnc-symbol";
-    private final float pValue = (float) 0.05;
+    private final float pValue = (float) 0.001;
     private List<String> cpdbIdsFg = new ArrayList<>();
     private List<String> cpdbIdsBg = new ArrayList<>();
     private Holder<List<String>> holderFg = new Holder<>(cpdbIdsFg);
@@ -65,11 +65,17 @@ public class PathwayEnricher {
         List<EPathway> ePathways = new ArrayList<>();
         try {
             cpdbPort.mapAccessionNumbers(accType, inputGenes, new Holder<>(inputGenes), holderFg);
-            System.out.println("Mapped Genes" + holderFg.toString());
-            System.out.println(cpdbPort.getCpdbVersion());
+
+            List<String> mappedGenes = holderFg.value;
+            List<String> eGenes = new ArrayList<>();
+            for (String m : mappedGenes) {
+                if (!m.isEmpty()) {
+                    eGenes.add(m);
+                }
+            }
+            holderFg.value = eGenes;
             cpdbPort.overRepresentationAnalysis(entityType, fsetType, holderFg.value, holderBg.value, accType, pValue, holderPNames, holderPDesc, holderOEnt, holderAEnt, holderPValues, holderQValues);
             System.out.println("OR Analysis started");
-            System.out.println("holderPNames.value.size()" + holderPNames.value.size());
             for (int i = 0; i < holderPNames.value.size(); i++) {
 
                 EPathway eP = new EPathway();
@@ -80,7 +86,7 @@ public class PathwayEnricher {
                 String origin = getPOrigin(name);
 
                 // check if the pathway is from either KEGG or Reactome
-                if (origin.equals("KEGG") || origin.equals("Reactome")) {
+                if (origin.equals("KEGG") || origin.equals("Reactome") || origin.equals("Biocarta")) {
                     // set name and origin
                     eP.setName(pName);
                     eP.setOrigin(origin);
@@ -148,14 +154,17 @@ public class PathwayEnricher {
         }
 
     }
-
+/*
     public static void main(String[] args) {
-       
+
         ReadTextFile reader = new ReadTextFile();
         List<String> gList = reader.extract("/home/peeyush/Desktop/APP.csv");
         PathwayEnricher enricher = new PathwayEnricher(gList);
         List<EPathway> ePaths = enricher.fetchEnrichedPathways();
-        System.out.println("Total pathways enriched: "+ePaths.size());
+        System.out.println("Total pathways enriched: " + ePaths.size());
+        for (EPathway eP : ePaths) {
+            System.out.println(eP.getName() + " " + eP.getPvalue());
+        }
     }
-
+*/
 }

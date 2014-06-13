@@ -179,6 +179,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         queryPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         queryPanel.setFont(new java.awt.Font("DejaVu Sans Mono", 0, 15)); // NOI18N
 
+        inputFile.setForeground(new java.awt.Color(132, 132, 132));
         inputFile.setText("path/to/geneList.csv");
 
         uploadFile.setText("File");
@@ -190,6 +191,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel1.setText("Choose  input file:");
+
+        additionalQuery.setForeground(new java.awt.Color(132, 132, 132));
+        additionalQuery.setText("e.g. Homo Sapiens,lung");
 
         jLabel2.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel2.setText("Additional query word(s):");
@@ -699,14 +703,48 @@ public class GeneMinerUI extends javax.swing.JFrame {
         System.out.println(genes.toString());
         PathwayEnricher enricher = new PathwayEnricher(genes);
         List<EPathway> ePathways = enricher.fetchEnrichedPathways();
+        
+        // This part writes output to a .csv format
+        BufferedWriter br = null;
+        try {
+            br = new BufferedWriter(new FileWriter(homePath+"/enrichedPathways.csv"));
+            StringBuilder csvFile = new StringBuilder();
+            csvFile.append("Name of Pathway");
+                csvFile.append(",");
+                csvFile.append("Origin database");
+                csvFile.append(",");
+                csvFile.append("P-value");
+                csvFile.append(",");
+                csvFile.append("Q-value");
+                csvFile.append("\n");
         if (!ePathways.isEmpty()) {
             for (EPathway eP : ePathways) {
                 System.out.println("EPathway: " + eP.toString());
+                csvFile.append(eP.getName());
+                csvFile.append(",");
+                csvFile.append(eP.getOrigin());
+                csvFile.append(",");
+                csvFile.append(eP.getPvalue());
+                csvFile.append(",");
+                csvFile.append(eP.getPvalue());
+                csvFile.append("\n");
             }
         } else {
             System.out.println("No pathways enriched.");
         }
+        
 
+            br.write(csvFile.toString());
+            br.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                br.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_MenuPathwayActionPerformed
 
     /**

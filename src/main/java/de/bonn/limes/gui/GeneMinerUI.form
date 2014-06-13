@@ -308,6 +308,9 @@
           <SubComponents>
             <Component class="javax.swing.JTextField" name="inputFile">
               <Properties>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="84" green="84" red="84" type="rgb"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="path/to/geneList.csv"/>
               </Properties>
             </Component>
@@ -328,6 +331,12 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="additionalQuery">
+              <Properties>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="84" green="84" red="84" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="e.g. Homo Sapiens,lung"/>
+              </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
