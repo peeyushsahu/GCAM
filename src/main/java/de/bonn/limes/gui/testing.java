@@ -15,33 +15,31 @@
  * #along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.bonn.limes.core;
+package de.bonn.limes.gui;
 
+import de.bonn.limes.core.ReadTextFile;
 import static de.bonn.limes.gui.GeneMinerUI.dirPath;
-import static de.bonn.limes.gui.GeneMinerUI.homePath;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author peeyush
  */
-public class FindDirectoryAddress {
+public class testing {
     
- /**
-  * This returns the current working directory
-  * @return 
-  */
- public void getpath(){
-    dirPath = System.getProperty("user.dir");
-    System.out.println("dirPath directory=  "+dirPath);
-    String home = System.getProperty("user.home");
-    boolean success = (new File(home+"/GeneMiner_output")).mkdir();
-    homePath = new StringBuilder().append(home).append("/GeneMiner_output").toString();
-    System.out.println("Home directory=  "+homePath);
-    System.out.println("Directory created: "+success);
- }
+   private List<String> cellarray = new ArrayList<>();
+   ReadTextFile celllist = new ReadTextFile();
+   
+   public void atest(){
+      cellarray = celllist.extract("/home/peeyush/NetBeansProjects/GeneMiner/cellTypes.csv");
+      for(String cell : cellarray){
+          System.out.println("Cell type:    "+cell);
+        }
+   }
+               
     public static void main(String[] args) {
-        FindDirectoryAddress hs = new FindDirectoryAddress();
-        hs.getpath();
+        testing tes = new testing();
+        tes.atest();
     }
 }

@@ -40,10 +40,13 @@ import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
 public class AbstractReposite {
 
     List<String> Glist; //To store gene list from user
+    Integer noAbst;
 
-    public TreeMap<String, List> getAbstracts(List<String> GeneList) throws InterruptedException {
+    public TreeMap<String, List> getAbstracts(List<String> GeneList,Integer maxAbs, Integer perSec) throws InterruptedException {
         this.Glist = GeneList;
         int count = 1;
+        this.noAbst = maxAbs;
+        List<Integer> ids;
         ProgressBar.setMaximum(Glist.size());
         try {
             TreeMap<String, List> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
@@ -51,12 +54,16 @@ public class AbstractReposite {
 
             for (String gene : Glist) {
                 System.out.println(gene.length());
-                if (gene.length() != 0) {
+                if (gene.length() != 0 && gene.length() > 2) {
                     System.out.println("this is the count for progress bar: "+count);
                     abstracts = new ArrayList<>();
                     System.out.println("Gene for abstract:  " + gene);
-                    //List<Integer> ids = new PubmedSearch().getPubMedIDs(gene, 500);
-                    List<Integer> ids = new PubmedSearch().getPubMedIDs(gene);
+                    if(noAbst != null){
+                    ids = new PubmedSearch().getPubMedIDs(gene, noAbst);
+                    }
+                    else{
+                    ids = new PubmedSearch().getPubMedIDs(gene);
+                    }
                     //System.out.println("Size of fetched PMID list"+ids.size());
                     ProgressBar.setValue(count++);
                     ProgressBar.repaint();
@@ -89,7 +96,7 @@ public class AbstractReposite {
                         } // if
                         else {
                             int countabst = 0;
-                            List<List<Integer>> parts = Lists.partition(ids, 100);
+                            List<List<Integer>> parts = Lists.partition(ids, perSec);
                             for (List<Integer> Slist : parts) {
 
                                 //System.out.println("Downloaded abstracts:"+Slist.size());

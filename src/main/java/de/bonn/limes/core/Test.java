@@ -45,6 +45,8 @@ public class Test {
         TreeMap<String, EntityTaged> abner = new TreeMap();
         List<String> entity2compare = new ArrayList();
         ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
+        Integer maxabs = 3500;
+        Integer persec = 500;
 
         // To read a user provided CSV file
 
@@ -57,7 +59,7 @@ public class Test {
     
        
         AbstractReposite TotalAbs = new AbstractReposite();
-        abstracts = TotalAbs.getAbstracts((List<String>) genes);
+        abstracts = TotalAbs.getAbstracts((List<String>) genes, maxabs, persec);
    
     
         //Writing abstracts into a text file

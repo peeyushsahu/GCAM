@@ -3,13 +3,16 @@
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="jMenuBar1">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="" noResource="true"/>
+      </Properties>
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="jMenu2">
+        <Menu class="javax.swing.JMenu" name="EnrichmentMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Analysis"/>
           </Properties>
@@ -260,12 +263,8 @@
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="synonymCheck" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="synonymHuman" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="synonymMouse" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="jButton1" min="-2" pref="153" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="fetchAbstracts" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="additionalQuery" alignment="1" max="32767" attributes="0"/>
@@ -296,9 +295,7 @@
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="fetchAbstracts" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="synonymCheck" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="synonymHuman" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="synonymMouse" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
@@ -335,7 +332,6 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="84" green="84" red="84" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="e.g. Homo Sapiens,lung"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
@@ -354,20 +350,13 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fetchAbstractsActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="synonymCheck">
+            <Component class="javax.swing.JButton" name="jButton1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Add synonyms for"/>
+                <Property name="text" type="java.lang.String" value="Settings for fetch"/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JRadioButton" name="synonymHuman">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Human OR"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JRadioButton" name="synonymMouse">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Mouse"/>
-              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

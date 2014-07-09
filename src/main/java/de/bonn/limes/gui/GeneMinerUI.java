@@ -22,6 +22,7 @@ import de.bonn.limes.core.CheckSynonymes;
 import de.bonn.limes.core.Entity2cell;
 import de.bonn.limes.core.FindDirectoryAddress;
 import de.bonn.limes.core.ReadTextFile;
+import de.bonn.limes.core.TimerManager;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
 import de.bonn.limes.utils.Utility;
@@ -65,18 +66,21 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private JTree tree;
     private int totAbs;
     private List<String> queries = new ArrayList<>();
-    private List<String> all_genes = new ArrayList<>();
-    private List<String> new_all_genes = new ArrayList<>();
-    private TreeMap<String, List> abstracts = new TreeMap<>();
+    private List<String> all_genes;
+    private List<String> new_all_genes;
+    private TreeMap<String, List> abstracts;
     private TreeMap<String, ArrayList> abnerResults;
     private File geneList;
     private List<String> entities2compare = new ArrayList<>();
     private ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
     private ReadTextFile reader = new ReadTextFile();
-    private List<List<String>> synonyms = new ArrayList<>();
+    private List<List<String>> synonyms;
     public static String dirPath;
     public static String homePath;
-
+    public static Integer synonymCheck = 0;
+    public static Integer humanSynonym;
+    public static Integer maxAbstract = 0;
+    public static Integer abstractperSec = 0;
     /**
      * Creates new form GeneMinerUI
      */
@@ -107,12 +111,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
         additionalQuery = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         fetchAbstracts = new javax.swing.JButton();
-        synonymCheck = new javax.swing.JCheckBox();
-        synonymHuman = new javax.swing.JRadioButton();
-        synonymMouse = new javax.swing.JRadioButton();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        EnrichmentMenu = new javax.swing.JMenu();
         NerAnalysis = new javax.swing.JMenuItem();
         HeatMap = new javax.swing.JMenuItem();
         MenuPathway = new javax.swing.JMenuItem();
@@ -193,7 +195,6 @@ public class GeneMinerUI extends javax.swing.JFrame {
         jLabel1.setText("Choose  input file:");
 
         additionalQuery.setForeground(new java.awt.Color(132, 132, 132));
-        additionalQuery.setText("e.g. Homo Sapiens,lung");
 
         jLabel2.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel2.setText("Additional query word(s):");
@@ -205,11 +206,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         });
 
-        synonymCheck.setText("Add synonyms for");
-
-        synonymHuman.setText("Human OR");
-
-        synonymMouse.setText("Mouse");
+        jButton1.setText("Settings for fetch");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout queryPanelLayout = new javax.swing.GroupLayout(queryPanel);
         queryPanel.setLayout(queryPanelLayout);
@@ -226,12 +228,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     .addGroup(queryPanelLayout.createSequentialGroup()
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
-                                .addComponent(synonymCheck)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(synonymHuman)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(synonymMouse)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(inputFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE))
@@ -255,9 +253,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fetchAbstracts)
-                    .addComponent(synonymCheck)
-                    .addComponent(synonymHuman)
-                    .addComponent(synonymMouse))
+                    .addComponent(jButton1))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -281,10 +277,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
             .addComponent(resultPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jMenuBar1.setName(""); // NOI18N
+
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Analysis");
+        EnrichmentMenu.setText("Analysis");
 
         NerAnalysis.setText("Named Entity Recignition");
         NerAnalysis.addActionListener(new java.awt.event.ActionListener() {
@@ -292,7 +290,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 NerAnalysisActionPerformed(evt);
             }
         });
-        jMenu2.add(NerAnalysis);
+        EnrichmentMenu.add(NerAnalysis);
 
         HeatMap.setText("EnrichmentAnalysis");
         HeatMap.addActionListener(new java.awt.event.ActionListener() {
@@ -300,7 +298,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 HeatMapActionPerformed(evt);
             }
         });
-        jMenu2.add(HeatMap);
+        EnrichmentMenu.add(HeatMap);
 
         MenuPathway.setText("PathwayAnalysis");
         MenuPathway.addActionListener(new java.awt.event.ActionListener() {
@@ -308,9 +306,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 MenuPathwayActionPerformed(evt);
             }
         });
-        jMenu2.add(MenuPathway);
+        EnrichmentMenu.add(MenuPathway);
 
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(EnrichmentMenu);
 
         help.setText("Help");
 
@@ -444,7 +442,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             ProgressBar.setVisible(true);
             // step 5: Occurrence analysis of cell types in named entity
             ReadTextFile cellEntity = new ReadTextFile();
-            entities2compare = cellEntity.extract("/home/peeyush/Desktop/cellTypes.csv");
+            entities2compare = cellEntity.extract(dirPath+"/cellTypes.csv");
             Entity2cell occurrenceTable = new Entity2cell();
             occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
             ProgressBar.setValue(0);
@@ -518,20 +516,25 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
+            TimerManager timer = new TimerManager();
+            timer.getTimeElapsed(0.0, "minutes");
             statusBar.setText("Downloading abstracts....");
             ProgressBar.setVisible(true);
+            new_all_genes = new ArrayList<>();
+            synonyms = new ArrayList<>();
+            abstracts = new TreeMap<>();
             
             //check for synonyms
-            if(synonymCheck.isSelected()){
+            if(synonymCheck==1){
                 System.out.println("Synonyms are being considered");
-                if(synonymHuman.isSelected()){
-                    synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/Human_synonym.csv", ",");
+                if(humanSynonym==1){                    
+                    synonyms = reader.extract(dirPath+"/Human_synonym.csv", ",");
                     CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
                     new_all_genes = cSynonym.withSynonym(synonyms);
                     System.out.println("Size of Human synonym list:   "+new_all_genes.size());
                 }
-                if(synonymMouse.isSelected()){
-                    synonyms = reader.extract("/home/peeyush/NetBeansProjects/GeneMiner/Mouse_synonym.csv", ",");
+                if(humanSynonym==0){                    
+                    synonyms = reader.extract(dirPath+"/Mouse_synonym.csv", ",");
                     CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
                     new_all_genes = cSynonym.withSynonym(synonyms);
                     System.out.println("Size of Mouse synonym list:   "+new_all_genes.size());  
@@ -579,7 +582,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             AbstractReposite abstractFetcher = new AbstractReposite();
             try {
                 System.out.println("Fetching is working");
-                abstracts = abstractFetcher.getAbstracts(queries);
+                abstracts = abstractFetcher.getAbstracts(queries,maxAbstract,abstractperSec);
                 System.out.println("Total abstracts: " + abstracts.size());
                 for (Map.Entry<String, List> abs : abstracts.entrySet()) {
                     System.out.println(abs.getKey() + " " + abs.getValue().size());
@@ -605,9 +608,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
             ArrayList<PubMedAbstract> objAbs = (ArrayList<PubMedAbstract>) abs.getValue();
             int NoAbstracts = 0;
+            absCount = absCount + objAbs.size();
             for (PubMedAbstract abst : objAbs) { //this will form tree for only 10 abstract per gene in GUI
                 NoAbstracts++;
-                absCount++;
+                //absCount++;
                 DefaultMutableTreeNode child = new DefaultMutableTreeNode("PMID:" + abst.getPMID());
                 parentChild.add(child);
                 if(NoAbstracts == 10)break;
@@ -680,6 +684,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         
         geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
         if (geneList.exists()) {
+            all_genes = new ArrayList<>();
             inputFile.setText(geneList.getAbsolutePath());
             FindDirectoryAddress createDir = new FindDirectoryAddress();
             createDir.getpath();
@@ -747,6 +752,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_MenuPathwayActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        AbstractSettings abstractSetting = new AbstractSettings();
+        abstractSetting.setabstract();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -773,6 +783,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GeneMinerUI ui = new GeneMinerUI();
+                ui.setTitle("GCAM:A Gene CellType Association Miner");
                 ui.setVisible(true);
                 ProgressBar.setVisible(false);
                 GraphicsConfiguration gc = ui.getGraphicsConfiguration();
@@ -785,6 +796,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu EnrichmentMenu;
     private javax.swing.JMenuItem HeatMap;
     private javax.swing.JMenuItem MenuPathway;
     private javax.swing.JMenuItem NerAnalysis;
@@ -797,19 +809,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem guide;
     private javax.swing.JMenu help;
     private javax.swing.JTextField inputFile;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel outerPanel;
     private javax.swing.JPanel queryPanel;
     private javax.swing.JPanel resultPanel;
     private javax.swing.JLabel statusBar;
-    private javax.swing.JCheckBox synonymCheck;
-    private javax.swing.JRadioButton synonymHuman;
-    private javax.swing.JRadioButton synonymMouse;
     private javax.swing.JButton uploadFile;
     // End of variables declaration//GEN-END:variables
 }

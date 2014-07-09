@@ -90,9 +90,6 @@ public class PubmedSearch {
 
         List<Integer> articleIds = new ArrayList<>();
         if(count != 0){
-            if(count < 20000)
-                { //this is added by me
-
                 String[] idList = res.getIdList().getId();
                 for (String id : idList) {
                     articleIds.add(new Integer(id));
@@ -100,7 +97,6 @@ public class PubmedSearch {
                 assert (count == articleIds.size()) : "result counts should match, "
                         + articleIds.size() + ":" + count;
                 return articleIds;
-                }
             }
         articleIds.add(0);
         return articleIds;

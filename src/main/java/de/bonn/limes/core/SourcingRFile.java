@@ -24,6 +24,7 @@ package de.bonn.limes.core;
 import static de.bonn.limes.core.StartRserve.isRserveRunning;
 import static de.bonn.limes.core.StartRserve.launchRserve;
 import static de.bonn.limes.gui.GeneMinerUI.homePath;
+import static de.bonn.limes.gui.GeneMinerUI.humanSynonym;
 import java.io.File;
 import java.io.IOException;
 import org.rosuda.REngine.REXP;
@@ -72,8 +73,10 @@ public class SourcingRFile {
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException, InterruptedException{
         public void analyse(float Pthreshold,float Ethreshold,int synonym,String test) throws RserveException, REXPMismatchException, REngineException, InterruptedException {       
                 //int synonym = 1;
-                //float threshold = (float) 0.2;
+                //float Ethreshold = (float) 0.2;
                 //homePath = "/home/peeyush/GeneMiner_output";
+                //String test = "fisher";
+                //float Pthreshold = (float) 0.001;
                 SourcingRFile sr = new SourcingRFile();
                 sr.checkLocalRserve();
                 RConnection c = new RConnection();                
@@ -85,9 +88,9 @@ public class SourcingRFile {
                     System.out.println("Script is compiling....");
                     Thread.sleep(1000);
                     // call the function. Return true
-                    String path = "palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+","+test+")";
+                    String path = "palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+",\""+test+"\")";
                     System.out.println(path);
-                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+","+test+")");
+                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\","+Pthreshold+","+Ethreshold+","+synonym+",\""+test+"\")");
                     System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 

@@ -194,7 +194,6 @@ public class PubMedFetcher {
         if (medlineCitationEl == null) {
             throw new XMLParseException("Could not find medline citation element");
         }
-
         Element idEl = getChildByName(medlineCitationEl, PMID);
         String idStr = getTextContent(idEl);
         Integer id = Integer.parseInt(idStr);
@@ -247,10 +246,16 @@ public class PubMedFetcher {
         if (title != null) {
             rec.title = title.replace("\t", " ");
         }
-        rec.abs = absStr.toString().replace("\t", " ");
-        rec.yearCreated = year;
-        rec.citation = citation;
-        rec.pubMedID = id;
+        if(absStr !=null){
+            rec.abs = absStr.toString().replace("\t", " ");
+        }
+        if(year !=null){
+            rec.yearCreated = year;
+        }
+        if(citation !=null){
+            rec.citation = citation;
+        }
+        rec.pubMedID = id;       
         return rec;
     }
 
