@@ -43,4 +43,11 @@
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-Pack Everything as Jar</actionName>
+            <displayName>Pack Everything as Jar</displayName>
+            <goals>
+                <goal>assembly:single</goal>
+            </goals>
+        </action>
     </actions>

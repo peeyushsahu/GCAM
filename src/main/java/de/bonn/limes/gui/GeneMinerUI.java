@@ -29,9 +29,7 @@ import de.bonn.limes.utils.Utility;
 import de.mpg.molgen.cpdb.EPathway;
 import de.mpg.molgen.cpdb.PathwayEnricher;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.Rectangle;
+import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,9 +41,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -81,6 +79,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
     public static Integer humanSynonym;
     public static Integer maxAbstract = 0;
     public static Integer abstractperSec = 0;
+    private String osname;
+    private String seprator;
+    private static final Logger GCAMLog = Logger.getLogger("de.limes.bonn");
+
     /**
      * Creates new form GeneMinerUI
      */
@@ -111,16 +113,15 @@ public class GeneMinerUI extends javax.swing.JFrame {
         additionalQuery = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         fetchAbstracts = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        fetchSettings = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
         EnrichmentMenu = new javax.swing.JMenu();
         NerAnalysis = new javax.swing.JMenuItem();
         HeatMap = new javax.swing.JMenuItem();
         MenuPathway = new javax.swing.JMenuItem();
         help = new javax.swing.JMenu();
-        about = new javax.swing.JMenuItem();
         guide = new javax.swing.JMenuItem();
+        about = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -206,10 +207,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Settings for fetch");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        fetchSettings.setText("Settings for fetch");
+        fetchSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                fetchSettingsActionPerformed(evt);
             }
         });
 
@@ -228,7 +229,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     .addGroup(queryPanelLayout.createSequentialGroup()
                         .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(queryPanelLayout.createSequentialGroup()
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(fetchSettings, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(fetchAbstracts))
                             .addComponent(additionalQuery, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -253,7 +254,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(queryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fetchAbstracts)
-                    .addComponent(jButton1))
+                    .addComponent(fetchSettings))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -278,9 +279,6 @@ public class GeneMinerUI extends javax.swing.JFrame {
         );
 
         jMenuBar1.setName(""); // NOI18N
-
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
 
         EnrichmentMenu.setText("Analysis");
 
@@ -311,17 +309,27 @@ public class GeneMinerUI extends javax.swing.JFrame {
         jMenuBar1.add(EnrichmentMenu);
 
         help.setText("Help");
+        help.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpActionPerformed(evt);
+            }
+        });
 
-        about.setText("About");
-        help.add(about);
-
-        guide.setText("Guide");
+        guide.setText("Manual");
         guide.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guideActionPerformed(evt);
             }
         });
         help.add(guide);
+
+        about.setText("About");
+        about.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutActionPerformed(evt);
+            }
+        });
+        help.add(about);
 
         jMenuBar1.add(help);
 
@@ -344,46 +352,46 @@ public class GeneMinerUI extends javax.swing.JFrame {
     /**
      * this method writes synonym for query genes
      */
-    private void WriteSynonyms(){
-        
-        BufferedWriter br = null;
-            try {
-                br = new BufferedWriter(new FileWriter(homePath+"/synonymList.csv"));
-                StringBuilder csvFile = new StringBuilder();
+    private void WriteSynonyms() {
 
-                for (String gene : all_genes){
-                    csvFile.append(gene);
-                    System.out.println("Gene:   "+gene);
-                    for(List eliaseList:synonyms){
-                        List<String> geneList = eliaseList;
-                       for(String eliase:geneList){
-                            if(gene.toLowerCase().equals(eliase.toLowerCase())){
-                                for(String elias:geneList){
-                                    if(!elias.toLowerCase().equals(gene.toLowerCase())){
-                                        csvFile.append(",");
-                                        csvFile.append(elias);
-                                    }
-                                }                                
-                                //break; 
-                            }                            
-                        }                       
+        BufferedWriter br = null;
+        try {
+            br = new BufferedWriter(new FileWriter(homePath + "/synonymList.csv"));
+            StringBuilder csvFile = new StringBuilder();
+
+            for (String gene : all_genes) {
+                csvFile.append(gene);
+                //System.out.println("Gene:   "+gene);
+                for (List eliaseList : synonyms) {
+                    List<String> geneList = eliaseList;
+                    for (String eliase : geneList) {
+                        if (gene.toLowerCase().equals(eliase.toLowerCase())) {
+                            for (String elias : geneList) {
+                                if (!elias.toLowerCase().equals(gene.toLowerCase())) {
+                                    csvFile.append(",");
+                                    csvFile.append(elias);
+                                }
+                            }
+                            //break; 
+                        }
                     }
-                    csvFile.append("\n");
                 }
-                br.write(csvFile.toString());
+                csvFile.append("\n");
+            }
+            br.write(csvFile.toString());
+            br.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
                 br.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        br.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-        
-                }
+            } catch (IOException ex) {
+                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
-    
+    }
+
     private void NerAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NerAnalysisActionPerformed
 
         // start NER process
@@ -392,18 +400,34 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }//GEN-LAST:event_NerAnalysisActionPerformed
 
     /**
-     * This is Swing threading for NER 
+     * This returns the separator for file system
      */
     
+    private void sep4os(){
+        osname = System.getProperty("os.name");
+        if (osname != null && osname.length() >= 7 && osname.substring(0,7).equals("Windows")) {
+            seprator = "\\";
+        }
+        else{
+            seprator = "/";
+        }
+        System.out.println("Separator is set");
+    }
+    
+    /**
+     * This is Swing threading for NER
+     */
     class UITagger extends SwingWorker<Void, Void> {
+
         @Override
         protected void done() {
             ProgressBar.setVisible(false);
+            statusBar.setText("NER & Occurrence analysis successful!.");
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-            statusBar.setText("NER & occurrence analysis running.....");
+            statusBar.setText("NER & occurrence analysis in process...");
             ProgressBar.setMaximum(totAbs);
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
@@ -412,8 +436,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 abnerResults = nerTagger.tagAbstracts();
                 abstracts = nerTagger.getAbstracts();
 
-            } 
-            else {
+            } else {
             }
             UIoccurrence occurrence = new UIoccurrence();
             occurrence.execute();
@@ -422,17 +445,16 @@ public class GeneMinerUI extends javax.swing.JFrame {
         }
 
     }
-    
+
     /**
      * This is for the occurrence analysis
      */
-
     class UIoccurrence extends SwingWorker<Void, Void> {
 
         @Override
         protected void done() {
             ProgressBar.setVisible(false);
-            JOptionPane.showMessageDialog(null, "NER & Occurrence analysis finished");
+            Utility.UI.showInfoMessage(getRootPane(), "NER & Occurrence analysis successful!");
 
         }
 
@@ -442,7 +464,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
             ProgressBar.setVisible(true);
             // step 5: Occurrence analysis of cell types in named entity
             ReadTextFile cellEntity = new ReadTextFile();
-            entities2compare = cellEntity.extract(dirPath+"/cellTypes.csv");
+            // entities2compare = cellEntity.extract(dirPath + "/cellTypes.csv");
+            entities2compare = cellEntity.extract("resources"+seprator+"cellTypes.csv");
             Entity2cell occurrenceTable = new Entity2cell();
             occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
             ProgressBar.setValue(0);
@@ -452,7 +475,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             // This part writes output to a .csv format
             BufferedWriter br = null;
             try {
-                br = new BufferedWriter(new FileWriter(homePath+"/firstResult.csv"));
+                br = new BufferedWriter(new FileWriter(homePath + seprator+"firstResult.csv"));
                 StringBuilder csvFile = new StringBuilder();
 
                 for (Occurrenceobj result : occurrenceResult) {
@@ -469,7 +492,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 for (Occurrenceobj result : occurrenceResult) {
 
                     csvFile.append(result.getGene());
-                    System.out.println("Gene name before writing: " + result.getGene());
+                    //System.out.println("Gene name before writing: " + result.getGene());
                     TreeMap<String, Integer> occurre = result.getOccurrence();
 
                     for (Map.Entry<String, Integer> entry : occurre.entrySet()) {
@@ -499,100 +522,104 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
 
     private void fetchAbstractsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fetchAbstractsActionPerformed
-
         AbstractLoader loader = new AbstractLoader();
         loader.execute();
     }//GEN-LAST:event_fetchAbstractsActionPerformed
 
     class AbstractLoader extends SwingWorker<Void, Void> {
-        
+
         @Override
         protected void done() {
             ProgressBar.setVisible(false);
-            statusBar.setText("Total Abstracts: " + totAbs);
-            JOptionPane.showMessageDialog(null, "Fetch successful!");
+            if (totAbs > 0) {
+                statusBar.setText("Total Abstracts: " + totAbs);
+                Utility.UI.showInfoMessage(getRootPane(), "Fetch successful!");
+            }
 
         }
 
         @Override
         protected Void doInBackground() {
-            TimerManager timer = new TimerManager();
-            timer.getTimeElapsed(0.0, "minutes");
-            statusBar.setText("Downloading abstracts....");
-            ProgressBar.setVisible(true);
-            new_all_genes = new ArrayList<>();
-            synonyms = new ArrayList<>();
-            abstracts = new TreeMap<>();
-            
-            //check for synonyms
-            if(synonymCheck==1){
-                System.out.println("Synonyms are being considered");
-                if(humanSynonym==1){                    
-                    synonyms = reader.extract(dirPath+"/Human_synonym.csv", ",");
-                    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
-                    new_all_genes = cSynonym.withSynonym(synonyms);
-                    System.out.println("Size of Human synonym list:   "+new_all_genes.size());
+            if (geneList == null) {
+                Utility.UI.showInfoMessage(getRootPane(), "No input file selected");
+            } else {
+
+                TimerManager timer = new TimerManager();
+                timer.getTimeElapsed(0.0, "minutes");
+                statusBar.setText("Fetching abstracts...");
+                ProgressBar.setVisible(true);
+                new_all_genes = new ArrayList<>();
+                synonyms = new ArrayList<>();
+                abstracts = new TreeMap<>();
+
+                //check for synonyms
+                if (synonymCheck == 1) {
+                    System.out.println("Synonyms are being considered");
+                    if (humanSynonym == 1) {
+                        // synonyms = reader.extract(dirPath + "/Human_synonym.csv", ",");
+                        synonyms = reader.extract("resources"+seprator+"Human_synonym.csv", ",");
+                        CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                        new_all_genes = cSynonym.withSynonym(synonyms);
+                        System.out.println("Size of Human synonym list:   " + new_all_genes.size());
+                    }
+                    if (humanSynonym == 0) {
+                        //synonyms = reader.extract(dirPath + "/Mouse_synonym.csv", ",");
+                        synonyms = reader.extract("resources"+seprator+"Mouse_synonym.csv", ",");
+                        CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                        new_all_genes = cSynonym.withSynonym(synonyms);
+                        System.out.println("Size of Mouse synonym list:   " + new_all_genes.size());
+                    }
+                } else {
+                    new_all_genes = reader.extract(geneList.getAbsolutePath());
                 }
-                if(humanSynonym==0){                    
-                    synonyms = reader.extract(dirPath+"/Mouse_synonym.csv", ",");
-                    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
-                    new_all_genes = cSynonym.withSynonym(synonyms);
-                    System.out.println("Size of Mouse synonym list:   "+new_all_genes.size());  
-                }
-            }
-            else{
-                new_all_genes = reader.extract(geneList.getAbsolutePath());
-            }
-            
-            // step 2: get additional query words
-            String additionalQ = additionalQuery.getText().trim();
-            if (!additionalQ.isEmpty()) {
 
-                if (additionalQ.contains(",")) {
-                    String[] adds = additionalQ.split(",");
-                    List<String> qWords = Arrays.asList(adds);
+                // step 2: get additional query words
+                String additionalQ = additionalQuery.getText().trim();
+                if (!additionalQ.isEmpty()) {
 
-                    for (String gene : new_all_genes) {
+                    if (additionalQ.contains(",")) {
+                        String[] adds = additionalQ.split(",");
+                        List<String> qWords = Arrays.asList(adds);
 
-                        StringBuilder queryBuider = new StringBuilder();
-                        if (!qWords.isEmpty()) {
-                            queryBuider.append(gene);
-                            for (String q : qWords) {
-                                queryBuider.append(" AND ").append(q);
+                        for (String gene : new_all_genes) {
+
+                            StringBuilder queryBuider = new StringBuilder();
+                            if (!qWords.isEmpty()) {
+                                queryBuider.append(gene);
+                                for (String q : qWords) {
+                                    queryBuider.append(" AND ").append(q);
+                                }
+                                queries.add(queryBuider.toString());
+                            } else {
+                                queries.add(gene);
                             }
+                        }
+                    } else {
+                        for (String gene : new_all_genes) {
+                            StringBuilder queryBuider = new StringBuilder();
+                            queryBuider.append(gene).append(" AND ").append(additionalQ);
                             queries.add(queryBuider.toString());
-                        } else {
-                            queries.add(gene);
                         }
                     }
                 } else {
                     for (String gene : new_all_genes) {
-                        StringBuilder queryBuider = new StringBuilder();
-                        queryBuider.append(gene).append(" AND ").append(additionalQ);
-                        queries.add(queryBuider.toString());
+                        queries.add(gene);
                     }
                 }
-            } else {
-                for (String gene : new_all_genes) {
-                    queries.add(gene);
+
+                // step 3: fetch the abstracts and save
+                AbstractReposite abstractFetcher = new AbstractReposite();
+                try {
+                    System.out.println("Fetching is progress...");
+                    abstracts = abstractFetcher.getAbstracts(queries, maxAbstract, abstractperSec);
+                    totAbs = buildTree(abstracts);
+                } catch (InterruptedException ex) {
+                    GCAMLog.log(Level.SEVERE, ex.getLocalizedMessage());
                 }
             }
 
-            // step 3: fetch the abstracts and save
-            AbstractReposite abstractFetcher = new AbstractReposite();
-            try {
-                System.out.println("Fetching is working");
-                abstracts = abstractFetcher.getAbstracts(queries,maxAbstract,abstractperSec);
-                System.out.println("Total abstracts: " + abstracts.size());
-                for (Map.Entry<String, List> abs : abstracts.entrySet()) {
-                    System.out.println(abs.getKey() + " " + abs.getValue().size());
-                }
-
-                totAbs = buildTree(abstracts);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
             return null;
+
         }
 
     }
@@ -614,14 +641,19 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 //absCount++;
                 DefaultMutableTreeNode child = new DefaultMutableTreeNode("PMID:" + abst.getPMID());
                 parentChild.add(child);
-                if(NoAbstracts == 10)break;
+                if (NoAbstracts == 50) {
+                    break;
+                }
             }
         }
         tree = new JTree(root);
         tree.setShowsRootHandles(true);
-        System.out.println("Total nodes: " + root.getChildCount());
-        System.out.println("Total siblings: " + root.getSiblingCount());
+        //System.out.println("Total nodes: " + root.getChildCount());
+        //System.out.println("Total siblings: " + root.getSiblingCount());
         tree.putClientProperty("JTree.lineStyle", "Horizontal");
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         // adding selection listener
@@ -649,7 +681,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             Object nodeInfo = node.getUserObject();
             if (node.isLeaf()) {
                 String pmid = (String) nodeInfo;
-                System.out.println("Abstract selected: " + pmid);
+                //System.out.println("Abstract selected: " + pmid);
                 String[] id = pmid.split(":");
                 int ID = Integer.parseInt(id[1]);
                 String fullAbstract = getCurrentAbstract(ID, gene);
@@ -681,40 +713,57 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }
 
     private void uploadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadFileActionPerformed
-        
-        geneList = Utility.UI.getFile(queryPanel, new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
-        if (geneList.exists()) {
-            all_genes = new ArrayList<>();
-            inputFile.setText(geneList.getAbsolutePath());
-            FindDirectoryAddress createDir = new FindDirectoryAddress();
-            createDir.getpath();
-            all_genes = reader.extract(geneList.getAbsolutePath());
+
+        geneList = Utility.UI.getFile(getRootPane(), new FileNameExtensionFilter(" CSV File (*.csv) ", "csv"));
+        if (geneList == null) {
+            GCAMLog.log(Level.WARNING, "No file selected.");
+        } else {
+            if (geneList.isFile()) {
+                all_genes = new ArrayList<>();
+                inputFile.setText(geneList.getAbsolutePath());
+                FindDirectoryAddress createDir = new FindDirectoryAddress();
+                createDir.getpath();
+                all_genes = reader.extract(geneList.getAbsolutePath());
+                sep4os();
+            }
         }
+
     }//GEN-LAST:event_uploadFileActionPerformed
 
     private void HeatMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HeatMapActionPerformed
-
+        statusBar.setText("Select parameters for statistical analysis.");
         enrichmentAnalysis performAnalysis = new enrichmentAnalysis();
         performAnalysis.runthis();
     }//GEN-LAST:event_HeatMapActionPerformed
 
     private void guideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guideActionPerformed
-        // TODO add your handling code here:
+             
+        File usrManual = new File(dirPath+seprator+"Manual.htm");
+        System.out.println(dirPath+seprator+"Manual.htm");
+        try {
+            Desktop.getDesktop().open(usrManual);
+        } catch (IOException ex) {
+            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_guideActionPerformed
 
     private void MenuPathwayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuPathwayActionPerformed
+        if (geneList == null) {
+            Utility.UI.showInfoMessage(getRootPane(), "No input file selected");
+        } else {
 
-        List<String> genes = all_genes;
-        System.out.println(genes.toString());
-        PathwayEnricher enricher = new PathwayEnricher(genes);
-        List<EPathway> ePathways = enricher.fetchEnrichedPathways();
-        
-        // This part writes output to a .csv format
-        BufferedWriter br = null;
-        try {
-            br = new BufferedWriter(new FileWriter(homePath+"/enrichedPathways.csv"));
-            StringBuilder csvFile = new StringBuilder();
-            csvFile.append("Name of Pathway");
+            statusBar.setText("Pathway enrichment in progress...");
+            List<String> genes = all_genes;
+            PathwayEnricher enricher = new PathwayEnricher(genes);
+            List<EPathway> ePathways = enricher.fetchEnrichedPathways();
+
+            // This part writes output to a .csv format
+            BufferedWriter br = null;
+            try {
+                br = new BufferedWriter(new FileWriter(homePath + seprator + "enrichedPathways.csv"));
+                StringBuilder csvFile = new StringBuilder();
+                csvFile.append("Name of Pathway");
                 csvFile.append(",");
                 csvFile.append("Origin database");
                 csvFile.append(",");
@@ -722,40 +771,53 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 csvFile.append(",");
                 csvFile.append("Q-value");
                 csvFile.append("\n");
-        if (!ePathways.isEmpty()) {
-            for (EPathway eP : ePathways) {
-                System.out.println("EPathway: " + eP.toString());
-                csvFile.append(eP.getName());
-                csvFile.append(",");
-                csvFile.append(eP.getOrigin());
-                csvFile.append(",");
-                csvFile.append(eP.getPvalue());
-                csvFile.append(",");
-                csvFile.append(eP.getPvalue());
-                csvFile.append("\n");
-            }
-        } else {
-            System.out.println("No pathways enriched.");
-        }
-        
+                if (!ePathways.isEmpty()) {
+                    for (EPathway eP : ePathways) {
+                        csvFile.append(eP.getName());
+                        csvFile.append(",");
+                        csvFile.append(eP.getOrigin());
+                        csvFile.append(",");
+                        csvFile.append(eP.getPvalue());
+                        csvFile.append(",");
+                        csvFile.append(eP.getPvalue());
+                        csvFile.append("\n");
+                    }
+                    statusBar.setText("Pathway enrichment successful!");
+                    Utility.UI.showInfoMessage(getRootPane(), "Enriched pathways saved to: " + homePath + seprator +"enrichedPathways.csv");
 
-            br.write(csvFile.toString());
-            br.close();
-        } catch (IOException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
+                } else {
+                    statusBar.setText("No pathways found for the input genes");
+                }
+
+                br.write(csvFile.toString());
                 br.close();
             } catch (IOException ex) {
                 Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }//GEN-LAST:event_MenuPathwayActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void fetchSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fetchSettingsActionPerformed
         AbstractSettings abstractSetting = new AbstractSettings();
         abstractSetting.setabstract();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_fetchSettingsActionPerformed
+
+    private void aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutActionPerformed
+        revalidate();
+        repaint();
+        About about = new About();
+        about.run_about();
+    }//GEN-LAST:event_aboutActionPerformed
+
+    private void helpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpActionPerformed
+  
+    }//GEN-LAST:event_helpActionPerformed
 
     /**
      * @param args the command line arguments
@@ -786,11 +848,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 ui.setTitle("GCAM:A Gene CellType Association Miner");
                 ui.setVisible(true);
                 ProgressBar.setVisible(false);
-                GraphicsConfiguration gc = ui.getGraphicsConfiguration();
-                Rectangle bounds = gc.getBounds();
-                Dimension size = ui.getPreferredSize();
-                ui.setLocation((int) ((bounds.width / 2) - (size.getWidth() / 2)),
-                        (int) ((bounds.height / 2) - (size.getHeight() / 2)));
+                Utility.UI.adjustScreenPosition(ui);
+                Utility.UI.addUIClosingListener(ui);
             }
         });
     }
@@ -806,13 +865,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private javax.swing.JEditorPane abstractShow;
     private javax.swing.JTextField additionalQuery;
     private javax.swing.JButton fetchAbstracts;
+    private javax.swing.JButton fetchSettings;
     private javax.swing.JMenuItem guide;
     private javax.swing.JMenu help;
     private javax.swing.JTextField inputFile;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel outerPanel;

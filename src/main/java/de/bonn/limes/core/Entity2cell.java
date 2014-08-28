@@ -55,17 +55,14 @@ public class Entity2cell {
         
         for (Map.Entry<String, ArrayList> genes : foundentity.entrySet()){
         gene = genes.getKey();
-            System.out.println("Gene user defined:  "+gene);
+            //System.out.println("Gene user defined:  "+gene);
             occuresult = new Occurrenceobj();
             this.found = genes.getValue();
             matches = new TreeMap();
-            System.out.println("Size of Abstracts(Entity2cell):  "+found.size());
-            System.out.println("Size of gene list:  "+entitytoCompare.size());
+            //System.out.println("Size of Abstracts(Entity2cell):  "+found.size());
+            //System.out.println("Size of gene list:  "+entitytoCompare.size());
             for (String cells : entitytoCompare){
                 int hit = 0;
-                if(cells.equals("vitreous")){
-                    System.out.println("TRUE");
-                }
                 matches.put(cells, hit);
                 
                 for(EntityTaged tags:found){
@@ -88,21 +85,21 @@ public class Entity2cell {
         
            }
         occuresult.setOccurrence(matches);
-            System.out.println("Gene to be put: "+gene);
+            //System.out.println("Gene to be put: "+gene);
         occuresult.setGene(gene);
         listofoccuresult.add(occuresult);
         
         }
-        System.out.println(listofoccuresult.size());
-        for(Occurrenceobj test:listofoccuresult){
-            System.out.println("Test for occoj: "+test.getGene());
-            System.out.println("Size of cell list:  "+test.getOccurrence().size());
-            System.out.println("Fkey of cell list:  "+test.getOccurrence().firstKey());
-            System.out.println("Lkey of cell list:  "+test.getOccurrence().lastKey());
-            System.out.println("Size of cell macrophage:  "+test.getOccurrence().get("vitreous"));
-            System.out.println("Size of cell macrophage:  "+test.getOccurrence().get("macrophage"));
+        //System.out.println(listofoccuresult.size());
+        //for(Occurrenceobj test:listofoccuresult){
+            //System.out.println("Test for occoj: "+test.getGene());
+            //System.out.println("Size of cell list:  "+test.getOccurrence().size());
+            //System.out.println("Fkey of cell list:  "+test.getOccurrence().firstKey());
+            //System.out.println("Lkey of cell list:  "+test.getOccurrence().lastKey());
+            //System.out.println("Size of cell macrophage:  "+test.getOccurrence().get("vitreous"));
+            //System.out.println("Size of cell macrophage:  "+test.getOccurrence().get("macrophage"));
            
-        }
+        //}
         return listofoccuresult;
         
     }

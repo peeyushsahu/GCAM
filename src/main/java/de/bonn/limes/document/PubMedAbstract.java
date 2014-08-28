@@ -16,8 +16,6 @@
  */
 package de.bonn.limes.document;
 
-import java.util.List;
-
 /**
  *
  * @author Vishal Siramshetty <srmshtty[at]gmail.com>
@@ -29,15 +27,6 @@ public class PubMedAbstract {
     private String AbstractText;
     private String CompleteAbstract;
     private String Year;
-    private List<Token> tokens;
-
-    public List<Token> getTokens() {
-        return tokens;
-    }
-
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
-    }
 
     /**
      * Getters
@@ -75,7 +64,12 @@ public class PubMedAbstract {
      * @return Year of publication
      */
     public String getYear() {
-        return Year;
+        if (Year.endsWith("-1")) {
+            return "NA";
+        } else {
+            return Year;
+        }
+
     }
 
     /**
@@ -84,17 +78,13 @@ public class PubMedAbstract {
      * @return PubMed Abstract
      */
     public String getCompleteAbstract() {
-        CompleteAbstract = "<html>" + "<b>Title</b>:" + "<p align=\"justify\">" + getTitle() + "</p>" + "<br>" + "<b>Year of Publication</b>:" + "<p align=\"justify\">" + getYear() + "</p>" + "</br></br>" + "<b>Abstract</b>:" + "<p align=\"justify\">" + getAbstractText() + "</p></html>";
-        return CompleteAbstract;
-    }
-    
-    public String getUpdatedAbstract() {
+        CompleteAbstract = "<html>" + "<b>Title</b>:" + "<p align=\"justify\">" + getTitle() + "</p>" + "<br>" + "<b>Year of Publication</b>:" + "<p align=\"justify\">" + getYear() + "</p>" + "<br>" + "<b>Abstract</b>:" + "<p align=\"justify\">" + getAbstractText() + "</p></html>";
         return CompleteAbstract;
     }
 
-    
-    
-    
+    public String getUpdatedAbstract() {
+        return CompleteAbstract;
+    }
 
     /**
      * Setters
@@ -116,7 +106,7 @@ public class PubMedAbstract {
     public void setYear(String year) {
         this.Year = year;
     }
-    
+
     public void setCompleteAbstract(String CompleteAbstract) {
         this.CompleteAbstract = CompleteAbstract;
     }

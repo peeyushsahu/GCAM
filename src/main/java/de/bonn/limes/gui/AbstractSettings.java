@@ -14,16 +14,13 @@
  * #You should have received a copy of the GNU General Public License
  * #along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.bonn.limes.gui;
 
 import static de.bonn.limes.gui.GeneMinerUI.abstractperSec;
 import static de.bonn.limes.gui.GeneMinerUI.humanSynonym;
 import static de.bonn.limes.gui.GeneMinerUI.maxAbstract;
 import static de.bonn.limes.gui.GeneMinerUI.synonymCheck;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.Rectangle;
+import de.bonn.limes.utils.Utility;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -33,7 +30,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
  * @author peeyush
  */
 public class AbstractSettings extends javax.swing.JFrame {
-    
+
     /**
      * Creates new form AbstractSettings
      */
@@ -62,26 +59,37 @@ public class AbstractSettings extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Maximum no of abstracts:");
+        jLabel1.setText("Maximum no. of abstracts:");
 
-        noOfAbstracts.setForeground(new java.awt.Color(160, 160, 160));
+        noOfAbstracts.setForeground(new java.awt.Color(83, 83, 83));
+        noOfAbstracts.setText("3000");
 
-        human.setText("Human or");
+        human.setText("Human");
         human.setEnabled(false);
+        human.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                humanActionPerformed(evt);
+            }
+        });
 
         mouse.setText("Mouse");
         mouse.setEnabled(false);
+        mouse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mouseActionPerformed(evt);
+            }
+        });
 
-        synonym.setText("Add Synonym");
+        synonym.setText("Add Synonyms");
         synonym.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 synonymActionPerformed(evt);
             }
         });
 
-        jLabel3.setText("No of Abstracts download per second");
+        jLabel3.setText("No. of Abstracts to download per second:");
 
-        abstractPerSec.setForeground(new java.awt.Color(160, 160, 160));
+        abstractPerSec.setForeground(new java.awt.Color(80, 80, 80));
         abstractPerSec.setText("3");
 
         set.setText("Set");
@@ -97,25 +105,24 @@ public class AbstractSettings extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(abstractPerSec, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(synonym)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(human)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(mouse)
+                        .addGap(18, 18, 18)
+                        .addComponent(set, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(set, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(noOfAbstracts, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(synonym)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(human)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(mouse))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(noOfAbstracts, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 19, Short.MAX_VALUE)))
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(abstractPerSec, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -127,20 +134,15 @@ public class AbstractSettings extends javax.swing.JFrame {
                     .addComponent(noOfAbstracts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(abstractPerSec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(human)
                     .addComponent(mouse)
+                    .addComponent(set)
                     .addComponent(synonym))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(abstractPerSec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                        .addComponent(set)
-                        .addContainerGap())))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -158,43 +160,46 @@ public class AbstractSettings extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void setActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setActionPerformed
-     
-        if(!noOfAbstracts.getText().equals(null)){
+
+        if (!noOfAbstracts.getText().equals(null)) {
             maxAbstract = Integer.parseInt(noOfAbstracts.getText());
         }
-        if(!abstractPerSec.getText().equals(null)){
+        if (!abstractPerSec.getText().equals(null)) {
             abstractperSec = Integer.parseInt(abstractPerSec.getText());
         }
-        if(synonym.isSelected()){
+        if (synonym.isSelected()) {
             synonymCheck = 1;
-            if(human.isSelected()){
+            if (human.isSelected()) {
                 humanSynonym = 1;
                 mouse.setSelected(false);
             }
-            if(mouse.isSelected()){
+            if (mouse.isSelected()) {
                 humanSynonym = 0;
                 human.setSelected(false);
             }
         }
         this.dispose();
-        
+
     }//GEN-LAST:event_setActionPerformed
 
     private void synonymActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_synonymActionPerformed
-        // TODO add your handling code here:
-        if(human.isEnabled()||mouse.isEnabled()){
-         human.setEnabled(false);
-         mouse.setEnabled(false);
-        }
-        else{
+        if (human.isEnabled() || mouse.isEnabled()) {
+            human.setEnabled(false);
+            mouse.setEnabled(false);
+        } else {
             human.setEnabled(true);
             mouse.setEnabled(true);
         }
     }//GEN-LAST:event_synonymActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void humanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_humanActionPerformed
+        mouse.setSelected(false);
+    }//GEN-LAST:event_humanActionPerformed
+
+    private void mouseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseActionPerformed
+        human.setSelected(false);
+    }//GEN-LAST:event_mouseActionPerformed
+
     public void setabstract() {
         /* Set the SeaGlass look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -220,11 +225,9 @@ public class AbstractSettings extends javax.swing.JFrame {
                 //new AbstractSettings().setVisible(true);
                 AbstractSettings ui = new AbstractSettings();
                 ui.setVisible(true);
-                GraphicsConfiguration gc = ui.getGraphicsConfiguration();
-                Rectangle bounds = gc.getBounds();
-                Dimension size = ui.getPreferredSize();
-                ui.setLocation((int) ((bounds.width / 2) - (size.getWidth() / 2)),
-                        (int) ((bounds.height / 2) - (size.getHeight() / 2)));
+                ui.setTitle("Abstract Fetch Settings");
+                Utility.UI.adjustScreenPosition(ui);
+                Utility.UI.addWindowClosingListener(ui);
             }
         });
     }

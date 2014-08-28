@@ -11,7 +11,7 @@ public class PubmedSearchTest {
 
     @Test
     public void testMesh() throws Exception {
-	List<Integer> articles = new PubmedSearch().getPubMedIDs("Verticillatol");
+	List<Integer> articles = new PubmedSearch().getPubMedIDs("CD44");
 	assertTrue(articles.size() > 10000);
     }
 }

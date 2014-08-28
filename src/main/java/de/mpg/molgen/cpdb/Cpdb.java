@@ -14,7 +14,7 @@ import javax.xml.ws.WebServiceFeature;
  * version: 2.1
  *
  */
-@WebServiceClient(name = "cpdb", targetNamespace = "cpdbns", wsdlLocation = "file:/home/peeyush/NetBeansProjects/GeneMiner/resources/CPDB.wsdl")
+@WebServiceClient(name = "cpdb", targetNamespace = "cpdbns", wsdlLocation = "http://cpdb.molgen.mpg.de/download/CPDB.wsdl")
 public class Cpdb
         extends Service {
 
@@ -26,9 +26,9 @@ public class Cpdb
         try {
             URL baseUrl;
             baseUrl = de.mpg.molgen.cpdb.Cpdb.class.getResource(".");
-            url = new URL(baseUrl, "file:/home/peeyush/NetBeansProjects/GeneMiner/resources/CPDB.wsdl");
+            url = new URL(baseUrl, "http://cpdb.molgen.mpg.de/download/CPDB.wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'file:/home/peeyush/NetBeansProjects/GeneMiner/resources/CPDB.wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'http://cpdb.molgen.mpg.de/download/CPDB.wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         CPDB_WSDL_LOCATION = url;

@@ -64,7 +64,7 @@ public class AbnerAnalysis {
             NerResultList = new ArrayList();
             gene = entry.getKey(); // gene name
             abstracts = entry.getValue();
-            System.out.println("Abstract size:  "+abstracts.size());
+            //System.out.println("Abstract size:  "+abstracts.size());
             
             for (PubMedAbstract iter :abstracts) {
                 ProgressBar.setValue(count++);
@@ -79,7 +79,9 @@ public class AbnerAnalysis {
                 
                 //System.out.println("################################################################");
                 //System.out.println("[CELL_TYPE SEGMENTS]");
+                //System.out.println("Prob is after here");
                 String[] cell_type = t.getEntities(s,"CELL_TYPE");
+                //System.out.println(cell_type.length);
                 if(cell_type.length > 0){
                     for (String cell_t:cell_type) {
                     //System.out.println(prots[i]);

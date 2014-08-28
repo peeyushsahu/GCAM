@@ -35,13 +35,13 @@ public class FindDirectoryAddress {
     dirPath = System.getProperty("user.dir");
     System.out.println("dirPath directory=  "+dirPath);
     String home = System.getProperty("user.home");
-    boolean success = (new File(home+"/GeneMiner_output")).mkdir();
-    homePath = new StringBuilder().append(home).append("/GeneMiner_output").toString();
+    boolean success = (new File(home+"/GCAM_output")).mkdir();
+    homePath = new StringBuilder().append(home).append("/GCAM_output").toString();
     System.out.println("Home directory=  "+homePath);
     System.out.println("Directory created: "+success);
  }
-    public static void main(String[] args) {
-        FindDirectoryAddress hs = new FindDirectoryAddress();
-        hs.getpath();
-    }
+    //public static void main(String[] args) {
+        //FindDirectoryAddress hs = new FindDirectoryAddress();
+        //hs.getpath();
+    //}
 }

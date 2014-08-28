@@ -16,6 +16,11 @@
  */
 package de.bonn.limes.utils;
 
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.Rectangle;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -31,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -644,7 +650,7 @@ public class Utility {
 
         public static File getFile(JComponent parent) {
             JFileChooser jfc = new JFileChooser();
-            jfc.setDialogTitle("VirtualSPARQLer: FileChooser");
+            jfc.setDialogTitle("GCAM: FileChooser");
             jfc.showOpenDialog(parent);
 
             return jfc.getSelectedFile();
@@ -655,7 +661,7 @@ public class Utility {
             File f = null;
             try {
                 JFileChooser jfc = new JFileChooser();
-                jfc.setDialogTitle("VirtualSPARQLer: FileSaver");
+                jfc.setDialogTitle("GCAM: FileSaver");
                 jfc.showSaveDialog(parent);
                 f = jfc.getSelectedFile();
                 f.createNewFile();
@@ -670,30 +676,124 @@ public class Utility {
         public static File getFile(JComponent parent, FileNameExtensionFilter filter) {
             JFileChooser jfc = new JFileChooser();
             jfc.addChoosableFileFilter(filter);
-            jfc.setDialogTitle("VirtualSPARQLer: FileChooser");
+            jfc.setDialogTitle("GCAM: FileChooser");
             jfc.showOpenDialog(parent);
             return jfc.getSelectedFile();
 
         }
 
         public static void showInfoMessage(JComponent parent, String message) {
-            JOptionPane.showMessageDialog(parent, message, "VirtualSPARQLer: Info", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parent, message, "GCAM: Info", JOptionPane.INFORMATION_MESSAGE);
 
+        }
+
+        /**
+         * Centers the UI on the screen
+         *
+         * @param ui
+         */
+        public static void adjustScreenPosition(JFrame ui) {
+            GraphicsConfiguration gc = ui.getGraphicsConfiguration();
+            Rectangle bounds = gc.getBounds();
+            Dimension size = ui.getPreferredSize();
+            ui.setLocation((int) ((bounds.width / 2) - (size.getWidth() / 2)),
+                    (int) ((bounds.height / 2) - (size.getHeight() / 2)));
+        }
+
+        public static void addUIClosingListener(final JFrame ui) {
+            ui.addWindowListener(new WindowListener() {
+
+                @Override
+                public void windowOpened(WindowEvent e) {
+
+
+                }
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    
+                    int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to close GCAM?",
+                            "GCAM",
+                            JOptionPane.YES_NO_OPTION);
+                    // if choosen Yes, then the application will be closed
+                    if (selectedOption == JOptionPane.YES_OPTION) {
+                        //ui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        ui.dispose();
+                    } else {
+                        ui.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                    }
+
+                }
+
+                @Override
+                public void windowClosed(WindowEvent e) {
+                }
+
+                @Override
+                public void windowIconified(WindowEvent e) {
+                }
+
+                @Override
+                public void windowDeiconified(WindowEvent e) {
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+                }
+
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+                }
+
+            });
+        }
+
+        public static void addWindowClosingListener(final JFrame ui) {
+            ui.addWindowListener(new WindowListener() {
+
+                @Override
+                public void windowOpened(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+                    int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to close the window?",
+                            "GCAM",
+                            JOptionPane.YES_NO_OPTION);
+                    // if choosen Yes, then the application will be closed
+                    if (selectedOption == JOptionPane.YES_OPTION) {
+                        ui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    } else {
+                        ui.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                    }
+
+                }
+
+                @Override
+                public void windowClosed(WindowEvent e) {
+                }
+
+                @Override
+                public void windowIconified(WindowEvent e) {
+                }
+
+                @Override
+                public void windowDeiconified(WindowEvent e) {
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+                }
+
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+                }
+
+            });
         }
     }
 }
-// -DEAD CODE -
-//    public static File createOutFile(DIR type, String parent, String child) throws IOException {
-//
-//        File parentDir = new File((File) curOutDir.get(type), parent);
-//        if (parentDir.mkdir()) {
-//            File childFile = new File(parentDir, child); // then create child inside "parent"
-//            if (childFile.createNewFile()) {
-//                return childFile;
-//            }
-//        } // create directory inside "type"
-//
-//        return null;
-//
-//    }
-
