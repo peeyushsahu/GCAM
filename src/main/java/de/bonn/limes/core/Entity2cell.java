@@ -40,8 +40,11 @@ public class Entity2cell {
     ArrayList<EntityTaged> found = new ArrayList();
     
    
-    /*
- 
+    /**
+     * This method counts the occurrence of celltypes in tagged entities. 
+     * @param cellentity
+     * @param abnerEntity
+     * @return 
      */
 
     public ArrayList<Occurrenceobj> compare(ArrayList cellentity, TreeMap abnerEntity) {

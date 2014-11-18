@@ -193,11 +193,11 @@ public class AbstractSettings extends javax.swing.JFrame {
     }//GEN-LAST:event_synonymActionPerformed
 
     private void humanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_humanActionPerformed
-        mouse.setSelected(false);
+        mouse.setVisible(false);
     }//GEN-LAST:event_humanActionPerformed
 
     private void mouseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseActionPerformed
-        human.setSelected(false);
+        human.setVisible(false);
     }//GEN-LAST:event_mouseActionPerformed
 
     public void setabstract() {

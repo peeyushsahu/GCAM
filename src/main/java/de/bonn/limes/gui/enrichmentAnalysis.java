@@ -19,9 +19,6 @@ package de.bonn.limes.gui;
 
 import de.bonn.limes.core.SourcingRFile;
 import de.bonn.limes.utils.Utility;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;

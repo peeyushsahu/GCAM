@@ -43,11 +43,11 @@ public interface CpdbPortType {
      * 
      * Provides a list of different types of accession numbers (e.g. 'uniprot') that are mappable to CPDB entity IDs.
      * Parameter 'entityType' should be either 'genes' or 'metabolites'.
-     * 			
+     * returns java.util.List java.lang.String		
      * 
      * @param entityType
      * @return
-     *     returns java.util.List<java.lang.String>
+     *   
      */
     @WebMethod(action = "cpdbns#getAvailableAccessionTypes")
     @WebResult(name = "accType", targetNamespace = "cpdbns")

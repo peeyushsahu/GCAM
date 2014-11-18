@@ -13,10 +13,12 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   
   #### Conversion of Data.frame into matrix
   path1 = paste(path,"/firstResult.csv",sep="")
-  path2 = paste(path,"/synonymList.csv",sep="")
+  if(synonym == 1){
+    path2 = paste(path,"/synonymList.csv",sep="")
+    SynonymList <- readLines(path2)
+  }
   path3 = paste(dirpath,"/resources/cell_type_synonyms.csv",sep="")
   GeneMinerData <- read.csv(path1,header=TRUE,stringsAsFactor=FALSE)
-  SynonymList <- readLines(path2)
   cellTypeSynonym <- read.csv(path3,header=FALSE,stringsAsFactor=FALSE) 
   #GeneMinerData <- read.csv(file.choose(),header=TRUE,stringsAsFactor=FALSE)
   #SynonymList <- readLines(file.choose())
@@ -41,11 +43,13 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   }
    
   #### converting list to list of lists
+  if(synonym == 1){
   geneRows <- c()
   SynonymList <- unique(SynonymList)
   for(i in 1:length(SynonymList)){
     SynonymList[i] <- strsplit(SynonymList[[i]], ",")
     geneRows[i] <- SynonymList[[i]][1]
+  }
   }
   
   #### Join column with synonym cell names
@@ -114,12 +118,12 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   else{
       
     #### Coverting dataframe to matrix
-    index = c()
-    for(i in 1:length(SynonymList)){
+    #index = c()
+    #for(i in 1:length(SynonymList)){
       #print(i)
-      index[i]  = which(tolower(GeneMinerData[,1]) == tolower(SynonymList[[i]][1]))
-    }
-    GeneMinerData <- GeneMinerData[index,]
+    #  index[i]  = which(tolower(GeneMinerData[,1]) == tolower(SynonymList[[i]][1]))
+    #}
+    #GeneMinerData <- GeneMinerData[index,]
     mat <- as.matrix(sapply(GeneMinerData[,-1], as.numeric))
     rownames(mat) <- GeneMinerData[,1]
     mat[is.na(mat)] <- 0 
@@ -281,13 +285,13 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   mat.rowname <- rownames(mat)
   mat.colname <- colnames(mat)
   
-  enrichment.result <- data.frame(Gene=character(1),cellType=character(1),Enrichment=numeric(1),pValue=numeric(1),FDR=numeric(1),Odds_Ratio=numeric(1),stringsAsFactors = FALSE)
+  enrichment.result <- data.frame(Gene=character(1),cellType=character(1),Enrichment=numeric(1),pValue=numeric(1),qValue=numeric(1),stringsAsFactors = FALSE)
   
   for(i in 1:dim(pValue.mat)[[1]]){
     for(j in 1:dim(pValue.mat)[[2]]){
       #if(mat[i,j] > Pthreshold){
       if(Adjusted.Pvalue[i,j] < 0.001){  
-        newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j],pValue.mat[i,j],Adjusted.Pvalue[i,j],oddRatio.mat[i,j])
+        newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j],pValue.mat[i,j],Adjusted.Pvalue[i,j])
         enrichment.result = rbind(enrichment.result,newrow)
       }
     }

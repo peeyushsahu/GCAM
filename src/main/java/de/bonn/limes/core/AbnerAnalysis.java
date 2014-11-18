@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.util.List;
+import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
 
 /**
  *
@@ -42,13 +43,16 @@ public class AbnerAnalysis {
     
     
     public AbnerAnalysis(TreeMap abstractReposite){
-        this.abstractList = abstractReposite; 
+        this.abstractList = abstractReposite;
+        progressbarCount = 0;
     }
     
     
-    /*
-    Returns arraylist of object entityTaged stores all information about NER using ABNER
-    */
+    /**
+     * Returns arraylist of object entityTaged stores all information about NER using ABNER.
+     * @return
+     * @throws IOException 
+     */
     
     public TreeMap NERanalysis() throws IOException{
     
@@ -67,8 +71,9 @@ public class AbnerAnalysis {
             //System.out.println("Abstract size:  "+abstracts.size());
             
             for (PubMedAbstract iter :abstracts) {
-                ProgressBar.setValue(count++);
-                ProgressBar.repaint();
+                progressbarCount++;
+                //ProgressBar.setValue(count++);
+                //ProgressBar.repaint();
                 NERentity = new EntityTaged();
                 entity = new ArrayList();
                 String s = iter.getAbstractText();

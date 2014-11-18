@@ -17,8 +17,15 @@
 
 package de.bonn.limes.core;
 
+import static de.bonn.limes.core.FindDirectoryAddress.homePath;
+import de.bonn.limes.gui.GeneMinerUI;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -64,5 +71,44 @@ public class CheckSynonymes {
         return geneWidSynonym;
         
     }
-    
+ 
+    public void WriteSynonyms(List synonym){
+        
+        BufferedWriter br = null;
+            try {
+                br = new BufferedWriter(new FileWriter(homePath+"/synonymList.csv"));
+                StringBuilder csvFile = new StringBuilder();
+
+                for (String gene : genes){
+                    csvFile.append(gene);
+                    //System.out.println("Gene:   "+gene);
+                    for(List eliaseList:synonyms){
+                        List<String> geneList = eliaseList;
+                       for(String eliase:geneList){
+                            if(gene.toLowerCase().equals(eliase.toLowerCase())){
+                                for(String elias:geneList){
+                                    if(!elias.toLowerCase().equals(gene.toLowerCase())){
+                                        csvFile.append(",");
+                                        csvFile.append(elias);
+                                    }
+                                }                                
+                                //break; 
+                            }                            
+                        }                       
+                    }
+                    csvFile.append("\n");
+                }
+                br.write(csvFile.toString());
+                br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        br.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+        
+                }
+        }
 }

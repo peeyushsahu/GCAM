@@ -21,6 +21,8 @@ import de.bonn.limes.core.AbstractTagger;
 import de.bonn.limes.core.CheckSynonymes;
 import de.bonn.limes.core.Entity2cell;
 import de.bonn.limes.core.FindDirectoryAddress;
+import static de.bonn.limes.core.FindDirectoryAddress.dirPath;
+import static de.bonn.limes.core.FindDirectoryAddress.homePath;
 import de.bonn.limes.core.ReadTextFile;
 import de.bonn.limes.core.TimerManager;
 import de.bonn.limes.document.PubMedAbstract;
@@ -73,15 +75,15 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
     private ReadTextFile reader = new ReadTextFile();
     private List<List<String>> synonyms;
-    public static String dirPath;
-    public static String homePath;
     public static Integer synonymCheck = 0;
     public static Integer humanSynonym;
     public static Integer maxAbstract = 0;
     public static Integer abstractperSec = 0;
+    public static Integer progressbarCount = 0;
     private String osname;
     private String seprator;
     private static final Logger GCAMLog = Logger.getLogger("de.limes.bonn");
+    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
 
     /**
      * Creates new form GeneMinerUI
@@ -349,49 +351,6 @@ public class GeneMinerUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * this method writes synonym for query genes
-     */
-    private void WriteSynonyms() {
-
-        BufferedWriter br = null;
-        try {
-            br = new BufferedWriter(new FileWriter(homePath + "/synonymList.csv"));
-            StringBuilder csvFile = new StringBuilder();
-
-            for (String gene : all_genes) {
-                csvFile.append(gene);
-                //System.out.println("Gene:   "+gene);
-                for (List eliaseList : synonyms) {
-                    List<String> geneList = eliaseList;
-                    for (String eliase : geneList) {
-                        if (gene.toLowerCase().equals(eliase.toLowerCase())) {
-                            for (String elias : geneList) {
-                                if (!elias.toLowerCase().equals(gene.toLowerCase())) {
-                                    csvFile.append(",");
-                                    csvFile.append(elias);
-                                }
-                            }
-                            //break; 
-                        }
-                    }
-                }
-                csvFile.append("\n");
-            }
-            br.write(csvFile.toString());
-            br.close();
-        } catch (IOException ex) {
-            Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                br.close();
-            } catch (IOException ex) {
-                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-    }
-
     private void NerAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NerAnalysisActionPerformed
 
         // start NER process
@@ -469,8 +428,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
             Entity2cell occurrenceTable = new Entity2cell();
             occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
             ProgressBar.setValue(0);
-            //writing gene with synonyms
-            WriteSynonyms();
+
 
             // This part writes output to a .csv format
             BufferedWriter br = null;
@@ -558,21 +516,24 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     if (humanSynonym == 1) {
                         // synonyms = reader.extract(dirPath + "/Human_synonym.csv", ",");
                         synonyms = reader.extract("resources"+seprator+"Human_synonym.csv", ",");
-                        CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
                         new_all_genes = cSynonym.withSynonym(synonyms);
+                        //writing gene with synonyms
+                        cSynonym.WriteSynonyms(new_all_genes);
                         System.out.println("Size of Human synonym list:   " + new_all_genes.size());
                     }
                     if (humanSynonym == 0) {
                         //synonyms = reader.extract(dirPath + "/Mouse_synonym.csv", ",");
                         synonyms = reader.extract("resources"+seprator+"Mouse_synonym.csv", ",");
-                        CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
                         new_all_genes = cSynonym.withSynonym(synonyms);
                         System.out.println("Size of Mouse synonym list:   " + new_all_genes.size());
+                        //writing gene with synonyms
+                        cSynonym.WriteSynonyms(new_all_genes);
                     }
                 } else {
                     new_all_genes = reader.extract(geneList.getAbsolutePath());
                 }
-
+               
+                
                 // step 2: get additional query words
                 String additionalQ = additionalQuery.getText().trim();
                 if (!additionalQ.isEmpty()) {
@@ -624,7 +585,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
     }
 
-    // This is to generate tree from genes and their PMIDS
+    /**
+     * This is to generate tree from genes and their PMIDS
+     * @param abstracts
+     * @return 
+     */
     private Integer buildTree(TreeMap<String, List> abstracts) {
         int absCount = 0;
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Abstracts");
@@ -672,7 +637,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
         resultPanel.add(BorderLayout.CENTER, sp);
         return absCount;
     }
-
+/**
+ * This method displays abstract if pmid is selected.
+ */
     private void displayAbstract() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         TreeNode parent = node.getParent();
@@ -692,7 +659,12 @@ public class GeneMinerUI extends javax.swing.JFrame {
             }
         }
     }
-
+/**
+ * This method retrieve the user selected pmid.
+ * @param id
+ * @param gene
+ * @return 
+ */
     private String getCurrentAbstract(int id, String gene) {
 
         List<PubMedAbstract> results = this.abstracts.get(gene);
@@ -711,6 +683,11 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
         return null;
     }
+    
+    /**
+     * Open upload option.
+     * @param evt 
+     */
 
     private void uploadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadFileActionPerformed
 
@@ -737,7 +714,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
     }//GEN-LAST:event_HeatMapActionPerformed
 
     private void guideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guideActionPerformed
-             
+        sep4os();
+        dirPath = System.getProperty("user.dir");     
         File usrManual = new File(dirPath+seprator+"Manual.htm");
         System.out.println(dirPath+seprator+"Manual.htm");
         try {

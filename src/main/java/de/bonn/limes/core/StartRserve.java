@@ -157,6 +157,8 @@ public class StartRserve {
 			RConnection c = new RConnection();
 			System.out.println("Rserve is running.");
 			c.close();
+                        //c.shutdown();
+                        //System.out.println("Rserve in shutdown.");
 			return true;
 		} catch (Exception e) {
 			System.out.println("First connect try failed with: "+e.getMessage());

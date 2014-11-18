@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.axis2.AxisFault;
 import com.google.common.collect.Lists;
-import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
+import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
 
 /**
  *
@@ -42,12 +42,10 @@ public class AbstractReposite {
     List<String> Glist; //To store gene list from user
     Integer noAbst;
 
-    public TreeMap<String, List> getAbstracts(List<String> GeneList, Integer maxAbs, Integer perSec) throws InterruptedException {
+    public TreeMap<String, List> getAbstracts(List<String> GeneList,Integer maxAbs, Integer perSec) throws InterruptedException {
         this.Glist = GeneList;
-        int count = 1;
         this.noAbst = maxAbs;
         List<Integer> ids;
-        ProgressBar.setMaximum(Glist.size());
         try {
             TreeMap<String, List> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
             List<PubMedAbstract> abstracts; // holds all PubMedAbstract object for gene list
@@ -58,15 +56,17 @@ public class AbstractReposite {
                     //System.out.println("this is the count for progress bar: "+count);
                     abstracts = new ArrayList<>();
                     //System.out.println("Gene for abstract:  " + gene);
-                    if (noAbst != null) {
-                        ids = new PubmedSearch().getPubMedIDs(gene, noAbst);
-                    } else {
-                        ids = new PubmedSearch().getPubMedIDs(gene);
+                    if(noAbst != null){
+                    ids = new PubmedSearch().getPubMedIDs(gene, noAbst);
                     }
+                    else{
+                    ids = new PubmedSearch().getPubMedIDs(gene);
+                    }
+                    progressbarCount++;
                     //System.out.println("Size of fetched PMID list"+ids.size());
-                    ProgressBar.setValue(count++);
-                    ProgressBar.repaint();
-                    //System.out.println("This should be the progress:    "+ProgressBar.getValue());
+                    //ProgressBar.setValue(progressbarCount++);
+                    //ProgressBar.repaint();
+                   //System.out.println("This should be the progress:    "+ProgressBar.getValue());
                     //System.out.println("Are there no abstracts for gene:    " + ids.isEmpty());
                     if (ids.get(0) != 0) {
                         //System.out.println(ids);
@@ -100,7 +100,7 @@ public class AbstractReposite {
 
                                 //System.out.println("Downloaded abstracts:"+Slist.size());
                                 List<PubMedRecord> records = new PubMedFetcher().getPubMedRecordForIDs(Slist);
-                                //System.out.println("Size of fetched PMID list"+records.size());
+                                 //System.out.println("Size of fetched PMID list"+records.size());
                                 //System.out.println(gene);
                                 if (!records.isEmpty()) {
                                     countabst++;
@@ -122,17 +122,20 @@ public class AbstractReposite {
                             }
                         }
                     }
+
+                    //System.out.println("Size of Abstracts:  " + abstracts.size());
                     geneWidAbstract.put(gene, abstracts);
+
                 }
             }
-            ProgressBar.setValue(0);
             return geneWidAbstract;
         } catch (AxisFault ex) {
-            Logger.getLogger(AbstractReposite.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (RemoteException ex) {
-            Logger.getLogger(AbstractReposite.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+
     }
 }

@@ -23,8 +23,8 @@ package de.bonn.limes.core;
  */
 import static de.bonn.limes.core.StartRserve.isRserveRunning;
 import static de.bonn.limes.core.StartRserve.launchRserve;
-import static de.bonn.limes.gui.GeneMinerUI.dirPath;
-import static de.bonn.limes.gui.GeneMinerUI.homePath;
+import static de.bonn.limes.core.FindDirectoryAddress.dirPath;
+import static de.bonn.limes.core.FindDirectoryAddress.homePath;
 import java.io.File;
 import java.io.IOException;
 import org.rosuda.REngine.REXP;
@@ -69,7 +69,17 @@ public class SourcingRFile {
 			((new File("/opt/bin/R")).exists() && launchRserve("/opt/bin/R"))
 			);
 	}
-            
+         /**
+          * This method will connect to R server and execute the script for count table analysis.
+          * @param Pthreshold
+          * @param Ethreshold
+          * @param synonym
+          * @param test
+          * @throws RserveException
+          * @throws REXPMismatchException
+          * @throws REngineException
+          * @throws InterruptedException 
+          */   
         //public static void main(String args[]) throws RserveException, REXPMismatchException, REngineException, InterruptedException{
         public void analyse(float Pthreshold,float Ethreshold,int synonym,String test) throws RserveException, REXPMismatchException, REngineException, InterruptedException {       
                 //int synonym = 0;
@@ -78,21 +88,29 @@ public class SourcingRFile {
                 //String test = "fisher";
                 //dirPath = System.getProperty("user.dir");
                 //float Pthreshold = (float) 0.001;
-                SourcingRFile sr = new SourcingRFile();
-                sr.checkLocalRserve();
                 RConnection c = new RConnection();
                 System.out.println("\""+dirPath+"/resources/palindrome.R\"");
                 c.assign(".tmp.", "source(\""+dirPath+"/resources/palindrome.R\")");
                 REXP r = c.parseAndEval("try(eval(parse(text=.tmp.)),silent=TRUE)");
-                if (r.inherits("try-error")) System.err.println("Error: "+r.toString());
+                if (r.inherits("try-error")){
+                    c.shutdown();
+                    System.err.println("Error: "+r.toString());
+                }
                 else {                 
                     c.parseAndEval("source(\""+dirPath+"/resources/palindrome.R\")");
                     System.out.println("Script is compiling....");
-                    Thread.sleep(5000);
+                    //Thread.sleep(5000);
                     // call the function. Return true
                     String path = "palindrome(\""+homePath+"\",\""+dirPath+"\","+Pthreshold+","+Ethreshold+","+synonym+",\""+test+"\")";
-                    //System.out.println(path);
-                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\",\""+dirPath+"\","+Pthreshold+","+Ethreshold+","+synonym+",\""+test+"\")");
+                    System.out.println(path);
+                    try{
+                    REXP generate_heatmap_pVal = c.parseAndEval("palindrome(\""+homePath+"\",\""+dirPath+"\","+Pthreshold+","+Ethreshold+","+synonym+",\""+test+"\")");                       
+                    }
+                    catch (Exception e2) {
+                        c.shutdown();
+                        System.out.println("Try failed with: "+e2.getMessage());
+			}
+                    
                     //System.out.println("Number of cell types with enrichment:   "+generate_heatmap_pVal.asInteger()); // prints 1 => true
                 }
                                 
