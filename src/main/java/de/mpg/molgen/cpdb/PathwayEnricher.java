@@ -33,7 +33,7 @@ public class PathwayEnricher {
     private final String entityType = "genes";
     private final String fsetType = "P";
     private final String accType = "hgnc-symbol";
-    private final float pValue = (float) 0.001;
+    private final float pValue = (float) 0.05;
     private List<String> cpdbIdsFg = new ArrayList<>();
     private List<String> cpdbIdsBg = new ArrayList<>();
     private Holder<List<String>> holderFg = new Holder<>(cpdbIdsFg);

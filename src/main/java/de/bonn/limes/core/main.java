@@ -37,6 +37,7 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
+
 /**
  *
  * @author peeyush
@@ -113,13 +114,13 @@ public class main {
                 System.out.println("Synonyms are being considered");
                 if (human == 1) {
                     read = new ReadTextFile();
-                    synonyms = read.extract(dirPath + "/Human_synonym.csv", ",");
+                    synonyms = read.extract(dirPath + "/resources/Human_synonym.csv", ",");
                     new_all_genes = cSynonym.withSynonym(synonyms);
                     System.out.println("Size of Human synonym list:   " + new_all_genes.size());
                 }
                 if (mouse == 1) {
                     read = new ReadTextFile();
-                    synonyms = read.extract(dirPath + "/Mouse_synonym.csv", ",");
+                    synonyms = read.extract(dirPath + "/resources/Mouse_synonym.csv", ",");
                     new_all_genes = cSynonym.withSynonym(synonyms);
                     System.out.println("Size of Mouse synonym list:   " + new_all_genes.size());
                 }
@@ -241,11 +242,28 @@ public class main {
                 }
             }
 
-            List<String> genes = all_genes;
-            System.out.println(genes.toString());
-            PathwayEnricher enricher = new PathwayEnricher(genes);
-            List<EPathway> ePathways = enricher.fetchEnrichedPathways();
+        //Running R for statistical analysis
+            //String test = "fisher";
+            //float Ethreshold;
+            //float Pthreshold;
+            try {
+                SourcingRFile DoinR = new SourcingRFile();
+                DoinR.checkLocalRserve();
+                DoinR.analyse(Pthreshold, Ethreshold, synonym, test);
 
+            } catch (RserveException ex) {
+                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (REXPMismatchException | REngineException ex) {
+            } catch (InterruptedException ex) {
+                Logger.getLogger(enrichmentAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          
+            
+            // This will perform the pthway analysis
+            System.out.println(all_genes.toString());
+            PathwayEnricher enricher = new PathwayEnricher(all_genes);
+            List<EPathway> ePathways = enricher.fetchEnrichedPathways();
+            
             // This part writes output to a pathways in csv format
             BufferedWriter path = null;
             try {
@@ -285,23 +303,6 @@ public class main {
                     System.err.println("Occurrence tabel can not be written");
                 }
             }
-
-        //Running R for statistical analysis
-            //String test = "fisher";
-            //float Ethreshold;
-            //float Pthreshold;
-            try {
-                SourcingRFile DoinR = new SourcingRFile();
-                DoinR.checkLocalRserve();
-                DoinR.analyse(Pthreshold, Ethreshold, synonym, test);
-
-            } catch (RserveException ex) {
-                Logger.getLogger(GeneMinerUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (REXPMismatchException | REngineException ex) {
-            } catch (InterruptedException ex) {
-                Logger.getLogger(enrichmentAnalysis.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
         }
 
     }
