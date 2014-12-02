@@ -21,6 +21,8 @@ import static de.bonn.limes.gui.GeneMinerUI.humanSynonym;
 import static de.bonn.limes.gui.GeneMinerUI.maxAbstract;
 import static de.bonn.limes.gui.GeneMinerUI.synonymCheck;
 import de.bonn.limes.utils.Utility;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -62,7 +64,7 @@ public class AbstractSettings extends javax.swing.JFrame {
         jLabel1.setText("Maximum no. of abstracts:");
 
         noOfAbstracts.setForeground(new java.awt.Color(83, 83, 83));
-        noOfAbstracts.setText("3000");
+        noOfAbstracts.setText("2000");
 
         human.setText("Human");
         human.setEnabled(false);
@@ -90,7 +92,7 @@ public class AbstractSettings extends javax.swing.JFrame {
         jLabel3.setText("No. of Abstracts to download per second:");
 
         abstractPerSec.setForeground(new java.awt.Color(80, 80, 80));
-        abstractPerSec.setText("3");
+        abstractPerSec.setText("500");
 
         set.setText("Set");
         set.addActionListener(new java.awt.event.ActionListener() {
@@ -160,7 +162,12 @@ public class AbstractSettings extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void setActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setActionPerformed
-
+        
+        if(synonym.isSelected() && !human.isSelected()&& !mouse.isSelected()){
+                    //default title and icon
+                    JOptionPane.showMessageDialog(new JFrame(),"Please select correct synonym option.");
+                }
+        else{
         if (!noOfAbstracts.getText().equals(null)) {
             maxAbstract = Integer.parseInt(noOfAbstracts.getText());
         }
@@ -179,6 +186,7 @@ public class AbstractSettings extends javax.swing.JFrame {
             }
         }
         this.dispose();
+        }
 
     }//GEN-LAST:event_setActionPerformed
 
@@ -193,11 +201,21 @@ public class AbstractSettings extends javax.swing.JFrame {
     }//GEN-LAST:event_synonymActionPerformed
 
     private void humanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_humanActionPerformed
-        mouse.setVisible(false);
+        if (mouse.isEnabled()){
+        mouse.setEnabled(false);
+        }
+        else{
+            mouse.setEnabled(true);
+        }
     }//GEN-LAST:event_humanActionPerformed
 
     private void mouseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseActionPerformed
-        human.setVisible(false);
+        if (human.isEnabled()){
+        human.setEnabled(false);
+        }
+        else{
+            human.setEnabled(true);
+        }
     }//GEN-LAST:event_mouseActionPerformed
 
     public void setabstract() {

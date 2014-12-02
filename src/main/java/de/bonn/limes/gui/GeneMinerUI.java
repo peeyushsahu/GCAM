@@ -83,7 +83,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private String osname;
     private String seprator;
     private static final Logger GCAMLog = Logger.getLogger("de.limes.bonn");
-    CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+    
 
     /**
      * Creates new form GeneMinerUI
@@ -502,8 +502,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 Utility.UI.showInfoMessage(getRootPane(), "No input file selected");
             } else {
 
-                TimerManager timer = new TimerManager();
-                timer.getTimeElapsed(0.0, "minutes");
+                CheckSynonymes cSynonym = new CheckSynonymes(all_genes);
+                //TimerManager timer = new TimerManager();
+                //timer.getTimeElapsed(0.0, "minutes");
                 statusBar.setText("Fetching abstracts...");
                 ProgressBar.setVisible(true);
                 new_all_genes = new ArrayList<>();
@@ -701,6 +702,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 FindDirectoryAddress createDir = new FindDirectoryAddress();
                 createDir.getpath();
                 all_genes = reader.extract(geneList.getAbsolutePath());
+                System.out.println("Input gene list:    "+all_genes);
                 sep4os();
             }
         }

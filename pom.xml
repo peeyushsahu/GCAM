@@ -149,10 +149,9 @@
             <version>0.6.3</version>
         </dependency>
         <dependency>
-            <groupId>ABioMedicalNER</groupId>
-            <artifactId>AbNER</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
+            <groupId>ABNER</groupId>
+            <artifactId>ABNER</artifactId>
+            <version>1.6</version>
         </dependency>
     </dependencies>
  

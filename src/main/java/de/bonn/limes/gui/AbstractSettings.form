@@ -102,7 +102,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="53" green="53" red="53" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="3000"/>
+            <Property name="text" type="java.lang.String" value="2000"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JRadioButton" name="human">
@@ -145,7 +145,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="50" green="50" red="50" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="3"/>
+            <Property name="text" type="java.lang.String" value="500"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="set">
