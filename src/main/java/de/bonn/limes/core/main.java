@@ -31,6 +31,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXPMismatchException;
@@ -47,15 +53,44 @@ public class main {
     /**
      * this method writes synonym for query genes
      */
+    public TreeMap NERmultithreading (TreeMap abstracts, int thread) throws InterruptedException, ExecutionException{
+    
+        //variable to store sum
+        ExecutorService executor = Executors.newFixedThreadPool(thread);
+        List<Callable<AtomicInteger>> callableList = new ArrayList<Callable<AtomicInteger>>();
+        
+        if(abstracts.size() > 10){
+            for(int count = 0; count <= 100; count++){
+                //callableList.add(getInstanceOfCallable(count,sum));
+                AbstractTagger nerTagger = new AbstractTagger(abstracts);
+                abnerResults = nerTagger.tagAbstracts();
+                //abstracts = nerTagger.getAbstracts();
+            }
+        }
+            
+    //Returns after all tasks complete
+    List<Future<AtomicInteger>> resFuture = executor.invokeAll(callableList);
+    
+        //Print results as future objects
+        for (Future<AtomicInteger> future : resFuture){
+            System.out.println("Status of future : " + future.isDone() +". Result of future :"+ future.get());
+        }
+    executor.shutdown();
+    return abnerResults; 
+    }
+    
+    
+    
     public static void main(String[] args) {
-        String filepath = "/home/peeyush/Desktop/testgene.csv";
-        System.out.println(filepath);
+        String filepath = null;// = "/home/peeyush/Desktop/genes.csv";
+        //System.out.println(filepath);
         String addQuery = "";
         int maxAbs = 30;
         int perRun = 30;
         int synonym = 0;
         int human = 1;
         int mouse = 0;
+        int thread = 2;
         float Ethreshold = (float) 0.3;
         float Pthreshold = (float) 0.05;
         String test = "fisher";
@@ -88,6 +123,9 @@ public class main {
             }
             if (parameter[0].contains("test")) {
                 test = parameter[1].trim();
+            }
+            if (parameter[0].contains("thread")) {
+                thread = Integer.parseInt(parameter[1].trim());
             }
         }
             FindDirectoryAddress createDir = new FindDirectoryAddress();
@@ -185,9 +223,14 @@ public class main {
 
             // step 4: This will perform NER on all abstracts
             if (!abstracts.isEmpty()) {
-                AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                abnerResults = nerTagger.tagAbstracts();
-                abstracts = nerTagger.getAbstracts();
+                if(abstracts.size() > 10){
+                    // call method for multithreading
+                }
+                else{
+                    AbstractTagger nerTagger = new AbstractTagger(abstracts);
+                    abnerResults = nerTagger.tagAbstracts();
+                    abstracts = nerTagger.getAbstracts();
+                }
             } else {
                 System.err.println("Fetched abstract list is empty.");
             }
