@@ -47,14 +47,15 @@ public class AbstractTagger {
         return abstracts;
     }
 
-    public AbstractTagger(TreeMap<String, List> abstracts) {
-        this.abstracts = abstracts;
-    }
+    //public AbstractTagger(TreeMap<String, List> abstracts) {
+        //this.abstracts = abstracts;
+    //}
 /**
  * This method returns abner tagged abstracts as a treemap.
  * @return TreeMap
  */
-    public TreeMap tagAbstracts() {
+    public TreeMap tagAbstracts(TreeMap abstracts) {
+        this.abstracts = abstracts;
         TreeMap<String, List> allAbstracts = new TreeMap<>(abstracts);
         AbnerAnalysis absTagger = new AbnerAnalysis((TreeMap) allAbstracts);
         try {

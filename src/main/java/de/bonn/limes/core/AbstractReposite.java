@@ -130,10 +130,10 @@ public class AbstractReposite {
             }
             return geneWidAbstract;
         } catch (AxisFault ex) {
-            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (RemoteException ex) {
-            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
 

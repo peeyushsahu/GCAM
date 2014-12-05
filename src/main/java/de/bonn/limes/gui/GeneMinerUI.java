@@ -391,8 +391,8 @@ public class GeneMinerUI extends javax.swing.JFrame {
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
                 abnerResults = new TreeMap<>();
-                AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                abnerResults = nerTagger.tagAbstracts();
+                AbstractTagger nerTagger = new AbstractTagger();
+                abnerResults = nerTagger.tagAbstracts(abstracts);
                 abstracts = nerTagger.getAbstracts();
 
             } else {
