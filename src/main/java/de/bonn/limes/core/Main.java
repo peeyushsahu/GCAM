@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -54,18 +55,19 @@ public class Main {
      */
     public TreeMap NERmultithreading(TreeMap abstracts, int thread) throws InterruptedException, ExecutionException {
 
+        ListOperations breakList = new ListOperations();
         //variable to store sum
         TreeMap<String, ArrayList> abnerResultM = new TreeMap<>();
         ExecutorService executor = Executors.newFixedThreadPool(thread);
         List<Callable<TreeMap>> callableList = new ArrayList<Callable<TreeMap>>();
         List<TreeMap> divTreemap = new ArrayList<>();
-
-        divTreemap = divideTreemap(abstracts);
+        //Send abstract TreeMap for division in SortedMaps
+        divTreemap = breakList.divideTreemap(abstracts);
         AbstractTagger nerTagger = new AbstractTagger();
 
-        for (int count = 0; count <= 10; count++) {
+        for (SortedMap maps : divTreemap) {
             //callableList.add(getInstanceOfCallable(count,sum));
-            callableList.add((Callable<TreeMap>) nerTagger.tagAbstracts(divTreemap.get(count)));
+            callableList.add((Callable<SortedMap>) nerTagger.tagAbstracts(maps));
             //abstracts = nerTagger.getAbstracts();
         }
 
@@ -79,27 +81,6 @@ public class Main {
         }
         executor.shutdown();
         return abnerResultM;
-    }
-
-    public List divideTreemap(TreeMap abstracts) {
-        List<TreeMap> divAbsList = new ArrayList<>();
-        int size = abstracts.size();
-        int divList = size / 10;
-
-        int lastElement = divList;
-        int firstElement = 1;
-        for (int i = 1; i <= 10; i++) {
-            if (i < 10) {
-                divAbsList.add((TreeMap) abstracts.subMap(firstElement, lastElement));
-                firstElement = lastElement;
-                lastElement = lastElement + divList;
-            } else {
-                divAbsList.add((TreeMap) abstracts.subMap(lastElement, size));
-            }
-        }
-
-        return divAbsList;
-
     }
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
@@ -243,6 +224,9 @@ public class Main {
         }
 
         // step 4: This will perform NER on all abstracts
+        for(Object i : abstracts.keySet().toArray()){
+            System.out.println("Gene names: "+i);
+        }
         if (!abstracts.isEmpty()) {
             if (abstracts.size() > 20) {
                 // call method for multithreading
