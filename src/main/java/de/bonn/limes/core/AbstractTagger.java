@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,21 +42,20 @@ import java.util.logging.Logger;
 public class AbstractTagger {
 
     private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
-    private TreeMap<String, List> abstracts;
+    private SortedMap<String, List> abstracts;
 
-    public TreeMap<String, List> getAbstracts() {
+    public SortedMap<String, List> getAbstracts() {
         return abstracts;
     }
 
-    //public AbstractTagger(TreeMap<String, List> abstracts) {
-        //this.abstracts = abstracts;
-    //}
+    public AbstractTagger(SortedMap<String, List> abstracts) {
+        this.abstracts = abstracts;
+    }
 /**
  * This method returns abner tagged abstracts as a treemap.
  * @return TreeMap
  */
-    public TreeMap tagAbstracts(TreeMap abstracts) {
-        this.abstracts = abstracts;
+    public TreeMap tagAbstracts() {
         TreeMap<String, List> allAbstracts = new TreeMap<>(abstracts);
         AbnerAnalysis absTagger = new AbnerAnalysis((TreeMap) allAbstracts);
         try {

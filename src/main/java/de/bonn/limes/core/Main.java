@@ -59,27 +59,36 @@ public class Main {
         //variable to store sum
         TreeMap<String, ArrayList> abnerResultM = new TreeMap<>();
         ExecutorService executor = Executors.newFixedThreadPool(thread);
-        List<Callable<TreeMap>> callableList = new ArrayList<Callable<TreeMap>>();
-        List<TreeMap> divTreemap = new ArrayList<>();
+        List<Callable<TreeMap>> callableList = new ArrayList<>();
         //Send abstract TreeMap for division in SortedMaps
-        divTreemap = breakList.divideTreemap(abstracts);
-        AbstractTagger nerTagger = new AbstractTagger();
-
-        for (SortedMap maps : divTreemap) {
-            //callableList.add(getInstanceOfCallable(count,sum));
-            callableList.add((Callable<SortedMap>) nerTagger.tagAbstracts(maps));
-            //abstracts = nerTagger.getAbstracts();
+        List<SortedMap> divTreemap = breakList.divideTreemap(abstracts);
+        //AbstractTagger nerTagger = new AbstractTagger();
+        System.out.println("Size of divTreeMap:"+divTreemap.size());
+        
+        for (final SortedMap maps : divTreemap) {
+            System.out.println("SortedMap: "+maps.size());
+            //System.out.println("SortedMap: "+maps);
+            Object[] mapKey = maps.keySet().toArray();
+            callableList.add(new Callable<TreeMap>(){
+                
+                @Override
+                public TreeMap call() throws Exception {
+                    AbstractTagger nerTagger = new AbstractTagger(maps);
+                    return nerTagger.tagAbstracts();
+                }
+                    });
         }
-
+        System.out.println("Size of callable: "+callableList.size());
         //Returns after all tasks complete
         List<Future<TreeMap>> resFuture = executor.invokeAll(callableList);
 
         //Print results as future objects
         for (Future<TreeMap> future : resFuture) {
             System.out.println("Status of future : " + future.isDone());
-            abnerResultM.putAll(future.get());
+            abnerResultM = future.get();
         }
         executor.shutdown();
+        System.out.println("Size of abner result: "+abnerResultM.size());
         return abnerResultM;
     }
 
@@ -87,12 +96,12 @@ public class Main {
         String filepath = "/home/peeyush/Desktop/genes.csv";
         System.out.println(filepath);
         String addQuery = "";
-        int maxAbs = 30;
-        int perRun = 30;
+        int maxAbs = 20;
+        int perRun = 20;
         int synonym = 0;
         int human = 1;
         int mouse = 0;
-        int thread = 2;
+        int thread = 4;
         float Ethreshold = (float) 0.3;
         float Pthreshold = (float) 0.05;
         String test = "fisher";
@@ -142,7 +151,6 @@ public class Main {
         TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
         List<String> entities2compare = new ArrayList<>();
         ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
-        AbstractTagger nerTagger = new AbstractTagger();
 
         System.out.println("Check point: 1");
         read = new ReadTextFile();
@@ -234,8 +242,9 @@ public class Main {
                 System.out.println("Using multithreading with no. of threads: "+thread);
                 abnerResults = mult.NERmultithreading(abstracts, thread);
             } else {
-                abnerResults = nerTagger.tagAbstracts(abstracts);
-                abstracts = nerTagger.getAbstracts();
+                        AbstractTagger nerTagger = new AbstractTagger(abstracts);
+                abnerResults = nerTagger.tagAbstracts();
+                //abstracts = nerTagger.getAbstracts();
             }
         } else {
             System.err.println("Fetched abstract list is empty.");
