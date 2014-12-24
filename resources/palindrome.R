@@ -230,7 +230,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   }
   
   else{
-  oddRatio.mat <- matrix(0,nrow=dim(mat4pVal)[1],ncol=dim(mat4pVal)[2])
+  #oddRatio.mat <- matrix(0,nrow=dim(mat4pVal)[1],ncol=dim(mat4pVal)[2])
   for(i in 1:dim(mat4pVal)[[1]]){
     for(j in 1:dim(mat4pVal)[[2]]){
       
@@ -250,11 +250,11 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
       pval = fisher.test(contigency, alternative="two.sided")
       #print(pval[[4]][[1]])
       pValue.mat[i,j] <- pval[[1]]
-      oddRatio.mat[i,j] <- pval[[3]][[1]]
+      #oddRatio.mat[i,j] <- pval[[3]][[1]]
     }
     else{
       pValue.mat[i,j] <- 1
-      oddRatio.mat[i,j] <- 0
+      #oddRatio.mat[i,j] <- 0
     }
   }
   }
@@ -285,7 +285,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   
   #dim(mat)
   #dim(pValue.mat)
-  Adjusted.Pvalue
+  #Adjusted.Pvalue
   mat.rowname <- rownames(mat)
   mat.colname <- colnames(mat)
   

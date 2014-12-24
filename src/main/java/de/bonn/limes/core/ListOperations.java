@@ -21,12 +21,59 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  *
  * @author peeyush
  */
 public class ListOperations {
+    
+    public TreeMap NERmultithreading(TreeMap abstracts, int thread) throws InterruptedException, ExecutionException {
+
+        ListOperations breakList = new ListOperations();
+        //variable to store sum
+        ArrayList<TreeMap<String, ArrayList>> abnerResultM = new ArrayList<>();
+        TreeMap<String, ArrayList> abnerResult = new TreeMap<>();
+        ExecutorService executor = Executors.newFixedThreadPool(thread);
+        List<Callable<TreeMap>> callableList = new ArrayList<>();
+        //Send abstract TreeMap for division in SortedMaps
+        List<SortedMap> divTreemap = breakList.divideTreemap(abstracts);
+        //AbstractTagger nerTagger = new AbstractTagger();
+        System.out.println("Size of divTreeMap:"+divTreemap.size());
+        
+        for (final SortedMap maps : divTreemap) {
+            System.out.println("SortedMap: "+maps.size());
+            //System.out.println("SortedMap: "+maps);
+            Object[] mapKey = maps.keySet().toArray();
+            callableList.add(new Callable<TreeMap>(){
+                
+                @Override
+                public TreeMap call() throws Exception {
+                    AbstractTagger nerTagger = new AbstractTagger(maps);
+                    return nerTagger.tagAbstracts();
+                }
+                    });
+        }
+        System.out.println("Size of callable: "+callableList.size());
+        //Returns after all tasks complete
+        List<Future<TreeMap>> resFuture = executor.invokeAll(callableList);
+
+        //Print results as future objects
+        for (Future<TreeMap> future : resFuture) {
+            System.out.println("Status of future : " + future.isDone());
+            abnerResultM.add(future.get());
+        }
+        executor.shutdown();
+        abnerResult = breakList.joinMaps(abnerResultM);
+        System.out.println("Size of abner result: "+abnerResultM.size());
+        System.out.println("This is the abner map: "+abnerResultM);
+        return abnerResult;
+    }
 
     public List divideTreemap(TreeMap abstracts) {        
         Object[] keyList = abstracts.keySet().toArray();

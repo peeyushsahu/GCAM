@@ -53,48 +53,7 @@ public class Main {
     /**
      * this method writes synonym for query genes
      */
-    public TreeMap NERmultithreading(TreeMap abstracts, int thread) throws InterruptedException, ExecutionException {
-
-        ListOperations breakList = new ListOperations();
-        //variable to store sum
-        ArrayList<TreeMap<String, ArrayList>> abnerResultM = new ArrayList<>();
-        TreeMap<String, ArrayList> abnerResult = new TreeMap<>();
-        ExecutorService executor = Executors.newFixedThreadPool(thread);
-        List<Callable<TreeMap>> callableList = new ArrayList<>();
-        //Send abstract TreeMap for division in SortedMaps
-        List<SortedMap> divTreemap = breakList.divideTreemap(abstracts);
-        //AbstractTagger nerTagger = new AbstractTagger();
-        System.out.println("Size of divTreeMap:"+divTreemap.size());
-        
-        for (final SortedMap maps : divTreemap) {
-            System.out.println("SortedMap: "+maps.size());
-            //System.out.println("SortedMap: "+maps);
-            Object[] mapKey = maps.keySet().toArray();
-            callableList.add(new Callable<TreeMap>(){
-                
-                @Override
-                public TreeMap call() throws Exception {
-                    AbstractTagger nerTagger = new AbstractTagger(maps);
-                    return nerTagger.tagAbstracts();
-                }
-                    });
-        }
-        System.out.println("Size of callable: "+callableList.size());
-        //Returns after all tasks complete
-        List<Future<TreeMap>> resFuture = executor.invokeAll(callableList);
-
-        //Print results as future objects
-        for (Future<TreeMap> future : resFuture) {
-            System.out.println("Status of future : " + future.isDone());
-            abnerResultM.add(future.get());
-        }
-        executor.shutdown();
-        abnerResult = breakList.joinMaps(abnerResultM);
-        System.out.println("Size of abner result: "+abnerResultM.size());
-        System.out.println("This is the abner map: "+abnerResultM);
-        return abnerResult;
-    }
-
+    
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         String filepath = "/home/peeyush/Desktop/testgene.csv";
         System.out.println(filepath);
@@ -241,7 +200,7 @@ public class Main {
         if (!abstracts.isEmpty()) {
             if (abstracts.size() > 10) {
                 // call method for multithreading
-                Main mult = new Main();
+                ListOperations mult = new ListOperations();
                 System.out.println("Using multithreading with no. of threads: "+thread);
                 abnerResults = mult.NERmultithreading(abstracts, thread);
             } else {
