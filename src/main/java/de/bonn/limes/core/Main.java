@@ -37,12 +37,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
+import de.bonn.limes.core.ListOperations;
 
 /**
  *
@@ -57,7 +57,8 @@ public class Main {
 
         ListOperations breakList = new ListOperations();
         //variable to store sum
-        TreeMap<String, ArrayList> abnerResultM = new TreeMap<>();
+        ArrayList<TreeMap<String, ArrayList>> abnerResultM = new ArrayList<>();
+        TreeMap<String, ArrayList> abnerResult = new TreeMap<>();
         ExecutorService executor = Executors.newFixedThreadPool(thread);
         List<Callable<TreeMap>> callableList = new ArrayList<>();
         //Send abstract TreeMap for division in SortedMaps
@@ -85,15 +86,17 @@ public class Main {
         //Print results as future objects
         for (Future<TreeMap> future : resFuture) {
             System.out.println("Status of future : " + future.isDone());
-            abnerResultM = future.get();
+            abnerResultM.add(future.get());
         }
         executor.shutdown();
+        abnerResult = breakList.joinMaps(abnerResultM);
         System.out.println("Size of abner result: "+abnerResultM.size());
-        return abnerResultM;
+        System.out.println("This is the abner map: "+abnerResultM);
+        return abnerResult;
     }
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        String filepath = "/home/peeyush/Desktop/genes.csv";
+        String filepath = "/home/peeyush/Desktop/testgene.csv";
         System.out.println(filepath);
         String addQuery = "";
         int maxAbs = 20;
@@ -236,7 +239,7 @@ public class Main {
             System.out.println("Gene names: "+i);
         }
         if (!abstracts.isEmpty()) {
-            if (abstracts.size() > 20) {
+            if (abstracts.size() > 10) {
                 // call method for multithreading
                 Main mult = new Main();
                 System.out.println("Using multithreading with no. of threads: "+thread);

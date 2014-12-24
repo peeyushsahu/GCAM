@@ -61,8 +61,15 @@ public class ListOperations {
      * @param occurrence
      * @return 
      */
-    public List joinMaps(List occurrence){
-        return null;
+    public TreeMap joinMaps(List<TreeMap<String, ArrayList>> occurrence){
+        TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
+        for(TreeMap map : occurrence){
+            Object[] keyMap = map.keySet().toArray();
+            for(Object key : keyMap){
+                abnerResults.put(key.toString(), (ArrayList) map.get(key));
+            }
+        }
+        return abnerResults;
         
     }
 }

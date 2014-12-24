@@ -1,6 +1,12 @@
+#GeneMinerData <- read.csv(file.choose(),header=TRUE,stringsAsFactor=FALSE)
+#SynonymList <- readLines(file.choose(),header=FALSE,stringsAsFactor=FALSE)
+path = "/home/peeyush/GCAM_output"
+dirpath = "/home/peeyush/Documents/GCAM-1.0"
+Pthreshold = 0.001
+Ethreshold = 0.3
+synonym = 1
+test = "binomial"
 palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
-  #path = "/home/peeyush/GCAM_output"
-  #dirpath = "/home/peeyush/Downloads/GCAM-1.0"
   ### Loading package for heatmap
   if (!require("gplots")) {
     install.packages("gplots", dependencies = TRUE)
@@ -19,9 +25,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   }
   path3 = paste(dirpath,"/resources/cell_type_synonyms.csv",sep="")
   GeneMinerData <- read.csv(path1,header=TRUE,stringsAsFactor=FALSE)
-  cellTypeSynonym <- read.csv(path3,header=FALSE,stringsAsFactor=FALSE) 
-  #GeneMinerData <- read.csv(file.choose(),header=TRUE,stringsAsFactor=FALSE)
-  #SynonymList <- readLines(file.choose())
+  cellTypeSynonym <- read.csv(path3,header=FALSE,stringsAsFactor=FALSE)
   
   #### Remove duplicates
   

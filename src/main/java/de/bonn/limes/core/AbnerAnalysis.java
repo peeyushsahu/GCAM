@@ -17,9 +17,9 @@
 
 package de.bonn.limes.core;
 
-import abner.Tagger;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.EntityTaged;
+import de.bonn.limes.gcam.abner.Tagger;
 import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
 import java.util.ArrayList;
 import java.util.Map;
