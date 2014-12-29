@@ -19,14 +19,15 @@ package de.bonn.limes.core;
 
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.EntityTaged;
-import de.bonn.limes.gcam.abner.Tagger;
-import static de.bonn.limes.gui.GeneMinerUI.ProgressBar;
+import de.bonn.limes.gcam.abner.MyTagger;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.util.List;
 import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
+import java.io.File;
+import java.util.Collections;
 
 /**
  *
@@ -34,11 +35,11 @@ import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
  */
 public class AbnerAnalysis {
     
-    TreeMap <String,ArrayList> abstractList = new TreeMap();
-    List<PubMedAbstract> abstracts = new ArrayList<>();
-    EntityTaged NERentity;
+    private TreeMap <String,ArrayList> abstractList = new TreeMap();
+    private List<PubMedAbstract> abstracts = new ArrayList<>();
+    private EntityTaged NERentity;
     
-    TreeMap<String,ArrayList> abnerResult = new TreeMap();
+    private TreeMap<String,ArrayList> abnerResult = new TreeMap();
     
     
     
@@ -56,10 +57,10 @@ public class AbnerAnalysis {
     
     public TreeMap NERanalysis() throws IOException{
     
-    Tagger t = new Tagger();
+    MyTagger t = new MyTagger(new File("/home/peeyush/Documents/netbeans_projects/GCAM-1.0/dependencies/nlpba.crf"));
     Integer PMID = null;   
     ArrayList <EntityTaged> NerResultList;// = new ArrayList();
-    ArrayList <String> entity;
+    List <String> entity = new ArrayList<>();
     String gene;
     EntityTaged test;    
         int count = 1;
@@ -72,35 +73,24 @@ public class AbnerAnalysis {
             
             for (PubMedAbstract iter :abstracts) {
                 progressbarCount++;
-                //ProgressBar.setValue(count++);
-                //ProgressBar.repaint();
                 NERentity = new EntityTaged();
-                entity = new ArrayList();
                 String s = iter.getAbstractText();
                 //System.out.println(s);
                 PMID = iter.getPMID();
                 
                 //starting of ABNER
-                
-                //System.out.println("################################################################");
-                //System.out.println("[CELL_TYPE SEGMENTS]");
-                //System.out.println("Prob is after here");
                 String[] cell_type = t.getEntities(s,"CELL_TYPE");
-                //System.out.println(cell_type.length);
                 if(cell_type.length > 0){
                     for (String cell_t:cell_type) {
-                    //System.out.println(prots[i]);
-                    //NERabs.get(abs.getPMID()).add(prots[i]);
+                    //System.out.println(cell_t);
                     entity.add(cell_t);
                     }
                 }
                 //System.out.println("################################################################");
-                //System.out.println("[CELL_LINE SEGMENTS]");
                 String[] cell_line = t.getEntities(s,"CELL_LINE");
+                //System.out.println("This is the abstract: "+s);
                 if(cell_line.length > 0){
                     for (String cell_l:cell_line) {
-                    //System.out.println(prot[i]);
-                    //NERabs.get(abs.getPMID()).add(prot[i]);
                     entity.add(cell_l);
                 }
              }
@@ -118,17 +108,6 @@ public class AbnerAnalysis {
             abnerResult.put(gene, NerResultList);
                                     
         }   
-        /*
-        for(Map.Entry<String,ArrayList> precheck : abnerResult.entrySet()){
-            System.out.println("AbnerAnalysis:key"+precheck.getKey());
-            System.out.println("AbnerAnalysis:value"+precheck.getValue());
-            System.out.println("Size of arraylist:  "+precheck.getValue().size());
-            for(Object ent:precheck.getValue()){
-                test =(EntityTaged) ent;
-                System.out.println("entity"+test.getTaggedentity());
-            }
-        }
-       */
         return abnerResult;
              
     }

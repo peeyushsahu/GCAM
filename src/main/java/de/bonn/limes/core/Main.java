@@ -30,18 +30,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
+import java.io.FileNotFoundException;
+import de.bonn.limes.core.TimerManager;
 import de.bonn.limes.core.ListOperations;
 
 /**
@@ -54,7 +51,7 @@ public class Main {
      * this method writes synonym for query genes
      */
     
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException, FileNotFoundException {
         String filepath = "/home/peeyush/Desktop/testgene.csv";
         System.out.println(filepath);
         String addQuery = "";
@@ -68,8 +65,7 @@ public class Main {
         float Pthreshold = (float) 0.05;
         String test = "fisher";
         boolean pathway = true;
-        System.out.println("Here");
-
+        
         for (int i = 0; i < args.length; i++) {
             String[] parameter = args[i].split("=");
             if (parameter[0].contains("filepath")) {
@@ -101,6 +97,12 @@ public class Main {
                 thread = Integer.parseInt(parameter[1].trim());
             }
         }
+        
+        //check if user provided required parameters
+        if (filepath == null){
+            throw new FileNotFoundException("Please provide path to genename.csv");
+        }
+        
         FindDirectoryAddress createDir = new FindDirectoryAddress();
         createDir.getpath();
 
@@ -109,8 +111,9 @@ public class Main {
         List<String> synonyms = new ArrayList<>();
         List<String> all_genes = new ArrayList<>();
         List<String> queries = new ArrayList<>();
-        TreeMap<String, List> abstracts = new TreeMap<>();
-        TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
+        TreeMap<String, ArrayList> abstracts = new TreeMap<>();
+        List<TreeMap<String, ArrayList>> abnerResults = new ArrayList();
+        TreeMap<String, ArrayList> abnerResult = new TreeMap();
         List<String> entities2compare = new ArrayList<>();
         ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
 
@@ -185,7 +188,7 @@ public class Main {
             System.out.println("Fetching is working");
             abstracts = abstractFetcher.getAbstracts(queries, maxAbs, perRun);
             //System.out.println("Total abstracts: " + abstracts.size());
-            for (Map.Entry<String, List> abs : abstracts.entrySet()) {
+            for (Map.Entry<String, ArrayList> abs : abstracts.entrySet()) {
                 //System.out.println(abs.getKey() + " " + abs.getValue().size());
             }
 
@@ -194,6 +197,8 @@ public class Main {
         }
 
         // step 4: This will perform NER on all abstracts
+        TimerManager countTime = new TimerManager();
+        countTime.getTimeElapsed("seconds");
         for(Object i : abstracts.keySet().toArray()){
             System.out.println("Gene names: "+i);
         }
@@ -203,21 +208,28 @@ public class Main {
                 ListOperations mult = new ListOperations();
                 System.out.println("Using multithreading with no. of threads: "+thread);
                 abnerResults = mult.NERmultithreading(abstracts, thread);
+                
+                //Joining list of tree maps into one treemap
+                ListOperations breakList = new ListOperations();
+                abnerResult = breakList.joinMaps(abnerResults);
             } else {
                         AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                abnerResults = nerTagger.tagAbstracts();
+                        abnerResult = nerTagger.tagAbstracts();
                 //abstracts = nerTagger.getAbstracts();
             }
         } else {
             System.err.println("Fetched abstract list is empty.");
         }
-
+        double time = countTime.getElapsedTime();
+        System.out.println("Time elapsed in NER: "+time);
+        
+        
         // step 5: This will perform the occurence analysis
         read = new ReadTextFile();
         entities2compare = read.extract(dirPath + "/resources/cellTypes.csv");
         System.out.println(entities2compare);
         Entity2cell occurrenceTable = new Entity2cell();
-        occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResults);
+        occurrenceResult = occurrenceTable.compare((ArrayList<String>) entities2compare, abnerResult);
 
         // This part writes output to a .csv format
         BufferedWriter br = null;

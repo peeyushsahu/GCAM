@@ -42,12 +42,12 @@ public class AbstractReposite {
     List<String> Glist; //To store gene list from user
     Integer noAbst;
 
-    public TreeMap<String, List> getAbstracts(List<String> GeneList,Integer maxAbs, Integer perSec) throws InterruptedException {
+    public TreeMap<String, ArrayList> getAbstracts(List<String> GeneList,Integer maxAbs, Integer perSec) throws InterruptedException {
         this.Glist = GeneList;
         this.noAbst = maxAbs;
         List<Integer> ids;
         try {
-            TreeMap<String, List> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
+            TreeMap<String, ArrayList> geneWidAbstract = new TreeMap();// holds all PubMedAbstract object for gene list with genes
             List<PubMedAbstract> abstracts; // holds all PubMedAbstract object for gene list
 
             for (String gene : Glist) {
@@ -124,7 +124,7 @@ public class AbstractReposite {
                     }
 
                     //System.out.println("Size of Abstracts:  " + abstracts.size());
-                    geneWidAbstract.put(gene, abstracts);
+                    geneWidAbstract.put(gene, (ArrayList) abstracts);
 
                 }
             }

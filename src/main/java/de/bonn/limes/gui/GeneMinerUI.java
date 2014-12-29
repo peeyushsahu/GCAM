@@ -69,7 +69,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private List<String> queries = new ArrayList<>();
     private List<String> all_genes;
     private List<String> new_all_genes;
-    private TreeMap<String, List> abstracts;
+    private TreeMap<String, ArrayList> abstracts;
     private TreeMap<String, ArrayList> abnerResults;
     private File geneList;
     private List<String> entities2compare = new ArrayList<>();
@@ -598,10 +598,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
      * @param abstracts
      * @return 
      */
-    private Integer buildTree(TreeMap<String, List> abstracts) {
+    private Integer buildTree(TreeMap<String, ArrayList> abstracts) {
         int absCount = 0;
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Abstracts");
-        for (Map.Entry<String, List> abs : abstracts.entrySet()) {
+        for (Map.Entry<String, ArrayList> abs : abstracts.entrySet()) {
 
             DefaultMutableTreeNode parentChild = new DefaultMutableTreeNode(abs.getKey());
             root.add(parentChild);

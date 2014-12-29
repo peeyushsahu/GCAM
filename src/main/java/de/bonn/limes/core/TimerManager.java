@@ -40,17 +40,17 @@ public class TimerManager {
      * @param timeUnit
      * @return
      */
-    public double getTimeElapsed(double startTime, String timeUnit) {
+    public void getTimeElapsed(String timeUnit) {
         this.dateFormat = new SimpleDateFormat("HH:MM:SS");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         this.startTime = System.currentTimeMillis();
         this.timeUnit = timeUnit;
         this.startTime = startTime;
 
-        return getElapsedTime(timeUnit);
+        //return getElapsedTime(timeUnit);
     }
 
-    private double getElapsedTime(String timeUnit) {
+    public double getElapsedTime() { //String timeUnit
         double currentTime = System.currentTimeMillis();
         switch (timeUnit) {
             case hours:

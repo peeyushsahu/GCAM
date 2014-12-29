@@ -22,7 +22,7 @@ import de.bonn.limes.entities.EntityTaged;
 import de.bonn.limes.gui.GeneMinerUI;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -42,13 +42,13 @@ import java.util.logging.Logger;
 public class AbstractTagger {
 
     private TreeMap<String, ArrayList> abnerResults = new TreeMap<>();
-    private SortedMap<String, List> abstracts;
+    private TreeMap<String, ArrayList> abstracts;
 
-    public SortedMap<String, List> getAbstracts() {
+    public TreeMap<String, ArrayList> getAbstracts() {
         return abstracts;
     }
 
-    public AbstractTagger(SortedMap<String, List> abstracts) {
+    public AbstractTagger(TreeMap<String, ArrayList> abstracts) {
         this.abstracts = abstracts;
     }
 /**
@@ -56,16 +56,16 @@ public class AbstractTagger {
  * @return TreeMap
  */
     public TreeMap tagAbstracts() {
-        TreeMap<String, List> allAbstracts = new TreeMap<>(abstracts);
-        AbnerAnalysis absTagger = new AbnerAnalysis((TreeMap) allAbstracts);
+        TreeMap<String, ArrayList> allAbstracts = new TreeMap<>(abstracts);
+        AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
         try {
             abnerResults = absTagger.NERanalysis();
             
             
             for (Map.Entry<String, ArrayList> tag : abnerResults.entrySet()) {
                 String gene = tag.getKey();
-                List<EntityTaged> taggedEs = tag.getValue();
-                 List<PubMedAbstract> aList = allAbstracts.get(gene);
+                ArrayList<EntityTaged> taggedEs = tag.getValue();
+                 ArrayList<PubMedAbstract> aList = allAbstracts.get(gene);
                 for (EntityTaged tagE : taggedEs) {
                     int pmid = tagE.getPMID();
                     String absText = getAbstract(pmid, gene);
@@ -83,9 +83,6 @@ public class AbstractTagger {
                         if (a.getPMID() == pmid) {
                             String newabs = absText;
                             a.setCompleteAbstract(newabs);
-                            //System.out.println(newabs);
-                            //System.out.println("++++++++++++++++++++++++++++++++++++");
-                            //System.out.println(a.getUpdatedAbstract()+a.getPMID());
                          }
                     }
                                                               
