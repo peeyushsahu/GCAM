@@ -17,6 +17,8 @@
 
 package de.bonn.limes.core;
 
+import de.bonn.limes.document.PubMedAbstract;
+import de.bonn.limes.entities.EntityTaged;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -69,7 +71,7 @@ public class ListOperations {
      */
     
     
-    public List NERmultithreading(TreeMap abstracts, int thread) throws InterruptedException, ExecutionException {
+    public TreeMap NERmultithreading(TreeMap abstracts, int thread) throws InterruptedException, ExecutionException {
 
         ListOperations breakList = new ListOperations();
         //variable to store sum
@@ -111,12 +113,96 @@ public class ListOperations {
             System.out.println("Catched error: "+e);
             Thread.currentThread().interrupt();            
         }
-        //abnerResult = breakList.joinMaps(abnerResultM);
+        abnerResult = breakList.joinMaps(abnerResultM);
         System.out.println("Size of abner result: "+abnerResultM.size());
         System.out.println("This is the abner map: "+abnerResultM);
-        return abnerResultM;
+       
+        return abnerResult;
     }
 
+    /**
+     * 
+     */
+    private static Map<String, ArrayList> abnerResult = new TreeMap<>();
+    class AbneRunable implements Runnable{
+        
+        TreeMap<String, ArrayList> maps;
+        TreeMap<String,ArrayList> nerRes = new TreeMap<>();
+
+        AbneRunable(TreeMap subMap) {
+            this.maps = subMap;
+        }
+        
+        @Override
+        public void run() {
+          for(Map.Entry<String, ArrayList> entry : maps.entrySet()){
+                System.out.println("Gene: "+entry.getKey());
+                for(Object entity:entry.getValue()){
+                    System.out.println("Astract: "+((PubMedAbstract)entity).getAbstractText());
+                }
+          }
+          AbstractTagger nerTagger = new AbstractTagger(maps);
+          nerRes = nerTagger.tagAbstracts();
+          System.out.println("######################One NER is finished.");
+          abnerResult.putIfAbsent(nerRes.firstKey(), nerRes.get(nerRes.firstKey()));
+
+        }
+        
+    }
+    
+    /**
+     * 
+     * @param abstracts
+     * @return 
+     */
+    
+    public TreeMap<String, ArrayList> MultithreadigRunable(TreeMap<String, ArrayList> abstracts){
+        
+        ListOperations breakList = new ListOperations();
+        TreeMap<String, ArrayList> singleAbstract;
+
+        abnerResult = Collections.synchronizedMap(new TreeMap<String, ArrayList>());
+        
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1);
+        System.out.println("Number of threads availble: "+Runtime.getRuntime().availableProcessors()+1);
+        
+        //Create thread instance for each gene
+        for(Map.Entry<String, ArrayList> entry : abstracts.entrySet()){
+            singleAbstract = new TreeMap<String, ArrayList>();
+            System.out.println("Gene: "+entry.getKey());
+            for(Object entity:entry.getValue()){
+                System.out.println("Astract: "+((PubMedAbstract)entity).getAbstractText());
+            }
+            singleAbstract.put(entry.getKey(), entry.getValue());
+            executor.execute(new AbneRunable(singleAbstract));            
+        }
+        executor.shutdown();
+        
+        //Await for sometime so as to allow the pending tasks to be finished
+        try{
+            while (!executor.awaitTermination(24L, TimeUnit.HOURS)) {
+                System.out.println("Still waiting for the executor to finish");
+            }
+            System.out.println("Executor finished");
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        TreeMap<String, ArrayList> abnerResultF = new TreeMap<>(abnerResult); 
+   
+        for(String gene : abnerResult.keySet()){
+            System.out.println("Gene: "+gene);
+            for(Object entity : abnerResult.get(gene)){
+                System.out.println(((EntityTaged)entity).getTaggedentity());
+            }
+        }
+      
+        return abnerResultF;
+        
+    }
+    
+    
+    
+    
 /**
  * 
  * @param abstracts

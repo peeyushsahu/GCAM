@@ -19,15 +19,16 @@ package de.bonn.limes.core;
 
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.EntityTaged;
-import de.bonn.limes.gcam.abner.MyTagger;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.util.List;
 import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
+import abner.*;
+import de.bonn.limes.gcam.abner.MyTagger;
+//import de.bonn.limes.gcam.abner.MyTagger;
 import java.io.File;
-import java.util.Collections;
 
 /**
  *
@@ -58,18 +59,20 @@ public class AbnerAnalysis {
     public TreeMap NERanalysis() throws IOException{
     
     MyTagger t = new MyTagger(new File("/home/peeyush/Documents/netbeans_projects/GCAM-1.0/dependencies/nlpba.crf"));
+    //Tagger t = new Tagger();
     Integer PMID = null;   
     ArrayList <EntityTaged> NerResultList;// = new ArrayList();
-    List <String> entity = new ArrayList<>();
+    List <String> entity;
     String gene;
     EntityTaged test;    
         int count = 1;
         for(Map.Entry<String, ArrayList> entry : abstractList.entrySet()){
             
             NerResultList = new ArrayList();
+            entity = new ArrayList<>();
             gene = entry.getKey(); // gene name
             abstracts = entry.getValue();
-            //System.out.println("Abstract size:  "+abstracts.size());
+            //System.out.println("Gene:  "+gene);
             
             for (PubMedAbstract iter :abstracts) {
                 progressbarCount++;
@@ -82,9 +85,9 @@ public class AbnerAnalysis {
                 String[] cell_type = t.getEntities(s,"CELL_TYPE");
                 if(cell_type.length > 0){
                     for (String cell_t:cell_type) {
-                    //System.out.println(cell_t);
-                    entity.add(cell_t);
-                    }
+                        System.out.println("Cell_Type: "+cell_t);
+                        entity.add(cell_t);
+                        }
                 }
                 //System.out.println("################################################################");
                 String[] cell_line = t.getEntities(s,"CELL_LINE");

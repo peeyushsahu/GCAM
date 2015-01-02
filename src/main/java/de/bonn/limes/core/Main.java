@@ -38,8 +38,6 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 import java.io.FileNotFoundException;
-import de.bonn.limes.core.TimerManager;
-import de.bonn.limes.core.ListOperations;
 
 /**
  *
@@ -55,8 +53,8 @@ public class Main {
         String filepath = "/home/peeyush/Desktop/testgene.csv";
         System.out.println(filepath);
         String addQuery = "";
-        int maxAbs = 20;
-        int perRun = 20;
+        int maxAbs = 10;
+        int perRun = 10;
         int synonym = 0;
         int human = 1;
         int mouse = 0;
@@ -112,7 +110,7 @@ public class Main {
         List<String> all_genes = new ArrayList<>();
         List<String> queries = new ArrayList<>();
         TreeMap<String, ArrayList> abstracts = new TreeMap<>();
-        List<TreeMap<String, ArrayList>> abnerResults = new ArrayList();
+        List<TreeMap<String, ArrayList>> abnerResults = new ArrayList<>();
         TreeMap<String, ArrayList> abnerResult = new TreeMap();
         List<String> entities2compare = new ArrayList<>();
         ArrayList<Occurrenceobj> occurrenceResult = new ArrayList();
@@ -199,19 +197,14 @@ public class Main {
         // step 4: This will perform NER on all abstracts
         TimerManager countTime = new TimerManager();
         countTime.getTimeElapsed("seconds");
-        for(Object i : abstracts.keySet().toArray()){
-            System.out.println("Gene names: "+i);
-        }
+        
         if (!abstracts.isEmpty()) {
-            if (abstracts.size() > 10) {
+            if (abstracts.size() > 20) {
                 // call method for multithreading
                 ListOperations mult = new ListOperations();
                 System.out.println("Using multithreading with no. of threads: "+thread);
-                abnerResults = mult.NERmultithreading(abstracts, thread);
-                
-                //Joining list of tree maps into one treemap
-                ListOperations breakList = new ListOperations();
-                abnerResult = breakList.joinMaps(abnerResults);
+                abnerResult = mult.MultithreadigRunable(abstracts);
+               
             } else {
                         AbstractTagger nerTagger = new AbstractTagger(abstracts);
                         abnerResult = nerTagger.tagAbstracts();

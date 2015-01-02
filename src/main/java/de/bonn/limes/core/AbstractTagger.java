@@ -22,10 +22,8 @@ import de.bonn.limes.entities.EntityTaged;
 import de.bonn.limes.gui.GeneMinerUI;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +54,17 @@ public class AbstractTagger {
  * @return TreeMap
  */
     public TreeMap tagAbstracts() {
+        
+        /**
+         * To print abstracts for every gene
+        for(Object i : abstracts.keySet()){
+            System.out.println("Gene names: "+i);
+            for(Object j : abstracts.get(i)){
+                System.out.println(((PubMedAbstract)j).getAbstractText());
+            }
+        }
+        */
+        
         TreeMap<String, ArrayList> allAbstracts = new TreeMap<>(abstracts);
         AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
         try {
@@ -65,13 +74,17 @@ public class AbstractTagger {
             for (Map.Entry<String, ArrayList> tag : abnerResults.entrySet()) {
                 String gene = tag.getKey();
                 ArrayList<EntityTaged> taggedEs = tag.getValue();
+                //System.out.println("Gene: "+gene);
+                //System.out.println("No. of abstract: "+taggedEs.size());
                  ArrayList<PubMedAbstract> aList = allAbstracts.get(gene);
                 for (EntityTaged tagE : taggedEs) {
                     int pmid = tagE.getPMID();
                     String absText = getAbstract(pmid, gene);
                     List<String> tags = tagE.getTaggedentity();
+                    //System.out.println("Size of taged entity: "+tags.size());
 
                     for (String t : tags) {
+                        //System.out.println("tags: "+t);
                         String tagedT = "<font style=\"background-color: yellow\">" + t + "</font>";
                         absText = absText.replace(t, tagedT);
                     }
