@@ -199,17 +199,9 @@ public class Main {
         countTime.getTimeElapsed("seconds");
         
         if (!abstracts.isEmpty()) {
-            if (abstracts.size() > 20) {
-                // call method for multithreading
-                ListOperations mult = new ListOperations();
-                System.out.println("Using multithreading with no. of threads: "+thread);
-                abnerResult = mult.MultithreadigRunable(abstracts);
-               
-            } else {
-                        AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                        abnerResult = nerTagger.tagAbstracts();
-                //abstracts = nerTagger.getAbstracts();
-            }
+            AbstractTagger nerTagger = new AbstractTagger(abstracts);
+            abnerResult = nerTagger.tagAbstracts();
+            //abstracts = nerTagger.getAbstracts();
         } else {
             System.err.println("Fetched abstract list is empty.");
         }

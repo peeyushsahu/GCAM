@@ -19,6 +19,7 @@ package de.bonn.limes.core;
 
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.EntityTaged;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -30,6 +31,8 @@ import java.util.concurrent.Future;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -135,16 +138,20 @@ public class ListOperations {
         
         @Override
         public void run() {
-          for(Map.Entry<String, ArrayList> entry : maps.entrySet()){
-                System.out.println("Gene: "+entry.getKey());
-                for(Object entity:entry.getValue()){
-                    System.out.println("Astract: "+((PubMedAbstract)entity).getAbstractText());
+            try {
+                for(Map.Entry<String, ArrayList> entry : maps.entrySet()){
+                    System.out.println("Gene: "+entry.getKey());
+                    for(Object entity:entry.getValue()){
+                        System.out.println("Astract: "+((PubMedAbstract)entity).getAbstractText());
+                    }
                 }
-          }
-          AbstractTagger nerTagger = new AbstractTagger(maps);
-          nerRes = nerTagger.tagAbstracts();
-          System.out.println("######################One NER is finished.");
-          abnerResult.putIfAbsent(nerRes.firstKey(), nerRes.get(nerRes.firstKey()));
+                AbnerAnalysis absTagger = new AbnerAnalysis(maps);
+                nerRes = absTagger.NERanalysis();
+                System.out.println("######################One NER is finished.");
+                abnerResult.put(nerRes.firstKey(), nerRes.get(nerRes.firstKey()));
+            } catch (IOException ex) {
+                Logger.getLogger(ListOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         }
         

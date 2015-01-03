@@ -55,6 +55,8 @@ public class AbstractTagger {
  */
     public TreeMap tagAbstracts() {
         
+        
+        
         /**
          * To print abstracts for every gene
         for(Object i : abstracts.keySet()){
@@ -66,9 +68,22 @@ public class AbstractTagger {
         */
         
         TreeMap<String, ArrayList> allAbstracts = new TreeMap<>(abstracts);
-        AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
+        //AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
         try {
-            abnerResults = absTagger.NERanalysis();
+            
+            if (allAbstracts.size() > 20) {
+                // call method for multithreading
+                ListOperations mult = new ListOperations();
+                System.out.println("Using multithreading with no. of threads");
+                abnerResults = mult.MultithreadigRunable(allAbstracts);
+               
+            } else {
+                        AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
+                        abnerResults = absTagger.NERanalysis();
+                //abstracts = nerTagger.getAbstracts();
+            }
+            
+            //abnerResults = absTagger.NERanalysis();
             
             
             for (Map.Entry<String, ArrayList> tag : abnerResults.entrySet()) {
