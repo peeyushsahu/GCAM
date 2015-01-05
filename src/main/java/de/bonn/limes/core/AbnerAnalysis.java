@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
 import abner.*;
+import static de.bonn.limes.core.FindDirectoryAddress.dirPath;
 import de.bonn.limes.gcam.abner.MyTagger;
 //import de.bonn.limes.gcam.abner.MyTagger;
 import java.io.File;
@@ -58,7 +59,7 @@ public class AbnerAnalysis {
     
     public TreeMap NERanalysis() throws IOException{
     
-    MyTagger t = new MyTagger(new File("/home/peeyush/Documents/netbeans_projects/GCAM-1.0/dependencies/nlpba.crf"));
+    MyTagger t = new MyTagger(new File(dirPath + "/dependencies/nlpba.crf"));
     //Tagger t = new Tagger();
     Integer PMID = null;   
     ArrayList <EntityTaged> NerResultList;// = new ArrayList();

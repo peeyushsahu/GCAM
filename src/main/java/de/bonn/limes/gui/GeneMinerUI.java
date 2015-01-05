@@ -391,17 +391,9 @@ public class GeneMinerUI extends javax.swing.JFrame {
             ProgressBar.setMaximum(totAbs);
             ProgressBar.setVisible(true);
             if (!abstracts.isEmpty()) {
-                if (abstracts.size() > 10) {
-                // call method for multithreading
-                ListOperations mult = new ListOperations();
-                System.out.println("Using multithreading with no. of threads: "+3);
-                abnerResults = mult.NERmultithreading(abstracts, 3);
-                } 
-                else {
-                    AbstractTagger nerTagger = new AbstractTagger(abstracts);
-                    abnerResults = nerTagger.tagAbstracts();
+                AbstractTagger nerTagger = new AbstractTagger(abstracts);
+                abnerResults = nerTagger.tagAbstracts();
                 //abstracts = nerTagger.getAbstracts();
-                }
             } else {
             }
             UIoccurrence occurrence = new UIoccurrence();

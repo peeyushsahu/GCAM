@@ -1,7 +1,7 @@
 #GeneMinerData <- read.csv(file.choose(),header=TRUE,stringsAsFactor=FALSE)
 #SynonymList <- readLines(file.choose(),header=FALSE,stringsAsFactor=FALSE)
 path = "/home/peeyush/GCAM_output"
-dirpath = "/home/peeyush/Documents/GCAM-1.0"
+dirpath = "/home/peeyush/NetBeansProjects/GCAM-1.0"
 Pthreshold = 0.001
 Ethreshold = 0.3
 synonym = 1
@@ -117,8 +117,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   GCN <- colnames(GeneMinerData)
   colnames(newMatrix.synonym) <- GCN[-1]
   mat <- newMatrix.synonym
-  } 
-  
+  }  
   else{
       
     #### Coverting dataframe to matrix
@@ -208,24 +207,48 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
     pValue.mat[i,j] <- Zscore
       }
     }
-    #sd <- sd(pValue.mat)
-    #mean <- mean(pValue.mat)
-    #pValue.mat <- apply(pValue.mat,2,function(x) (x <- pnorm(x, mean = mean, sd = sd, lower.tail=FALSE)))
-    mat.rowname <- rownames(mat)
-    mat.colname <- colnames(mat)
-    enrichment.result <- data.frame(Gene=character(1),cellType=character(1),Enrichment=numeric(1),Enrichment_Score=numeric(1), stringsAsFactors = FALSE)
+    sd <- sd(pValue.mat)
+    mean <- mean(pValue.mat)
+    pValue.mat <- apply(pValue.mat,2,function(x) (x <- pnorm(x, mean = mean, sd = sd, lower.tail=FALSE)))
     
+    ### For calculating ADJUSTED PValues with multiple correction
+    
+    ### matrix -> Adjusted.Pvalue contains Adjusted pValues
+    PValue.Data.frame <-  as.data.frame(pValue.mat)
+    rownames(PValue.Data.frame) <- rownames(mat4pVal)
+    colnames(PValue.Data.frame) <- colnames(mat4pVal)
+    
+    Adjusted.Pvalue <- pValue.mat
+    FDR = 0.05
+    No.of.cellTypes = dim(pValue.mat)[[2]]
     for(i in 1:dim(pValue.mat)[[1]]){
       for(j in 1:dim(pValue.mat)[[2]]){
-        #if(mat[i,j] > Pthreshold){
-        if(pValue.mat[i,j] > 50){  
-          newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j],pValue.mat[i,j])
-          enrichment.result = rbind(enrichment.result,newrow)
+        
+        if(pValue.mat[i,j] < FDR/No.of.cellTypes){
+          Adjusted.Pvalue[i,j] <- Adjusted.Pvalue[i,j]*No.of.cellTypes        
+        }
+        else{
+          Adjusted.Pvalue[i,j] <- 1.0
+        }
+      }
+    } 
+    
+    
+    mat.rowname <- rownames(mat)
+    mat.colname <- colnames(mat)
+    enrichment.result <- data.frame(Gene=character(0),cellType=character(0),Enrichment=numeric(0),pValue=numeric(0),qValue=numeric(0), stringsAsFactors = FALSE)
+    count = 1
+    for(i in 1:dim(pValue.mat)[[1]]){
+      for(j in 1:dim(pValue.mat)[[2]]){
+        if(pValue.mat[i,j] < 0.05 ){
+          newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j]/sum(mat[i,]),pValue.mat[i,j],Adjusted.Pvalue[i,j])
+          enrichment.result[count,] = newrow
+          count = count +1
         }
       }
     }
     
-    write.csv(enrichment.result, file = paste(path,"/enrichment_binomial.csv",sep=""),na = "NA", row.names = TRUE)
+    write.table(enrichment.result, file = paste(path,"/enrichment_binomial.csv",sep=""),na = "NA", row.names = TRUE, sep = "\t")
     
   }
   
@@ -288,20 +311,19 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
   #Adjusted.Pvalue
   mat.rowname <- rownames(mat)
   mat.colname <- colnames(mat)
-  
-  enrichment.result <- data.frame(Gene=character(1),cellType=character(1),Enrichment=numeric(1),pValue=numeric(1),qValue=numeric(1),stringsAsFactors = FALSE)
-  
+  enrichment.result <- data.frame(Gene=character(0),cellType=character(0),Enrichment=numeric(0),pValue=numeric(0),qValue=numeric(0), stringsAsFactors = FALSE)
+  count = 1
   for(i in 1:dim(pValue.mat)[[1]]){
     for(j in 1:dim(pValue.mat)[[2]]){
-      #if(mat[i,j] > Pthreshold){
-      if(Adjusted.Pvalue[i,j] < 0.001){  
-        newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j],pValue.mat[i,j],Adjusted.Pvalue[i,j])
-        enrichment.result = rbind(enrichment.result,newrow)
+      if(pValue.mat[i,j] < 0.05 ){
+        newrow <- list(mat.rowname[[i]],mat.colname[[j]],mat[i,j]/sum(mat[i,]),pValue.mat[i,j],Adjusted.Pvalue[i,j])
+        enrichment.result[count,] = newrow
+        count = count +1
       }
     }
   }
   
-  write.csv(enrichment.result, file = paste(path,"/enrichment_fisher.csv",sep=""),na = "NA", row.names = TRUE)
+  write.table(enrichment.result, file = paste(path,"/enrichment_fisher.csv",sep=""), na = "NA", row.names = TRUE, sep = "\t")
   }
   #### Z-transformation 
   reduced.mat <- mat/rowSums(mat)

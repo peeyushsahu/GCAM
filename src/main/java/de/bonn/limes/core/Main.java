@@ -50,11 +50,11 @@ public class Main {
      */
     
     public static void main(String[] args) throws InterruptedException, ExecutionException, FileNotFoundException {
-        String filepath = "/home/peeyush/Desktop/testgene.csv";
+        String filepath = "/home/peeyush/Desktop/genes.csv";
         System.out.println(filepath);
         String addQuery = "";
-        int maxAbs = 10;
-        int perRun = 10;
+        int maxAbs = 50;
+        int perRun = 50;
         int synonym = 0;
         int human = 1;
         int mouse = 0;

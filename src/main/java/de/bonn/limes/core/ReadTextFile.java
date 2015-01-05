@@ -57,7 +57,8 @@ public class ReadTextFile {
 
                 // use comma seprated file to retrieve text
                 String[] Sline = line.split(delimiter);
-                entityNames.add(Sline[0].trim());
+                //entityNames.add(Sline[0].trim());
+                entityNames.add(Sline[0]);
 
             }
             return entityNames;
