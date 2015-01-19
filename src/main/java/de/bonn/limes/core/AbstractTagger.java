@@ -57,17 +57,17 @@ public class AbstractTagger {
         
         TreeMap<String, ArrayList> allAbstracts = new TreeMap<>(abstracts);
         try {
-            
-            if (allAbstracts.size() > 40) {
+            /**
+            if (allAbstracts.size() > 10) {
                 // call method for multithreading
                 ListOperations mult = new ListOperations();
                 System.out.println("Using multithreading with no. of threads");
                 abnerResults = mult.MultithreadigRunable(allAbstracts);
                
-            } else {
+            } else {**/
                         AbnerAnalysis absTagger = new AbnerAnalysis(allAbstracts);
                         abnerResults = absTagger.NERanalysis();
-            }
+            //}
             
             //abnerResults = absTagger.NERanalysis();
             

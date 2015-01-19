@@ -248,7 +248,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
       }
     }
     
-    write.table(enrichment.result, file = paste(path,"/enrichment_binomial.csv",sep=""),na = "NA", row.names = TRUE, sep = "\t")
+    write.table(enrichment.result, file = paste(path,"/enrichment_binomial.csv",sep=""),na = "NA", row.names = TRUE, col.names = TRUE, sep = "\t")
     
   }
   
@@ -323,7 +323,7 @@ palindrome <- function(path, dirpath, Pthreshold, Ethreshold, synonym, test) {
     }
   }
   
-  write.table(enrichment.result, file = paste(path,"/enrichment_fisher.csv",sep=""), na = "NA", row.names = TRUE, sep = "\t")
+  write.table(enrichment.result, file = paste(path,"/enrichment_fisher.csv",sep=""), na = "NA", row.names = TRUE, col.names = TRUE, sep = "\t")
   }
   #### Z-transformation 
   reduced.mat <- mat/rowSums(mat)

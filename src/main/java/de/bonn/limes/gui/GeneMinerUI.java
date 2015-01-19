@@ -23,9 +23,7 @@ import de.bonn.limes.core.Entity2cell;
 import de.bonn.limes.core.FindDirectoryAddress;
 import static de.bonn.limes.core.FindDirectoryAddress.dirPath;
 import static de.bonn.limes.core.FindDirectoryAddress.homePath;
-import de.bonn.limes.core.ListOperations;
 import de.bonn.limes.core.ReadTextFile;
-import de.bonn.limes.core.TimerManager;
 import de.bonn.limes.document.PubMedAbstract;
 import de.bonn.limes.entities.Occurrenceobj;
 import de.bonn.limes.utils.Utility;
@@ -46,7 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -84,6 +81,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private String osname;
     private String seprator;
     private static final Logger GCAMLog = Logger.getLogger("de.limes.bonn");
+    public static boolean settingFetch = false;
     
 
     /**
@@ -479,8 +477,13 @@ public class GeneMinerUI extends javax.swing.JFrame {
 
 
     private void fetchAbstractsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fetchAbstractsActionPerformed
+        if(settingFetch == false){
+            Utility.UI.showInfoMessage(getRootPane(), "Please provide fetch settings!!!");
+        }
+        else{
         AbstractLoader loader = new AbstractLoader();
         loader.execute();
+        }
     }//GEN-LAST:event_fetchAbstractsActionPerformed
 
     class AbstractLoader extends SwingWorker<Void, Void> {
@@ -506,6 +509,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 //timer.getTimeElapsed(0.0, "minutes");
                 statusBar.setText("Fetching abstracts...");
                 ProgressBar.setVisible(true);
+                ProgressBar.setIndeterminate(true);
                 new_all_genes = new ArrayList<>();
                 synonyms = new ArrayList<>();
                 abstracts = new TreeMap<>();
@@ -513,9 +517,10 @@ public class GeneMinerUI extends javax.swing.JFrame {
                 //check for synonyms
                 if (synonymCheck == 1) {
                     System.out.println("Synonyms are being considered");
+                    System.out.println("Reading synonyms from: "+homePath+"/resources");
                     if (humanSynonym == 1) {
                         // synonyms = reader.extract(dirPath + "/Human_synonym.csv", ",");
-                        synonyms = reader.extract("resources"+seprator+"Human_synonym.csv", ",");
+                        synonyms = reader.extract(homePath +"/resources"+seprator+"Human_synonym.csv", ",");
                         new_all_genes = cSynonym.withSynonym(synonyms);
                         //writing gene with synonyms
                         cSynonym.WriteSynonyms(new_all_genes);
@@ -523,7 +528,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
                     }
                     if (humanSynonym == 0) {
                         //synonyms = reader.extract(dirPath + "/Mouse_synonym.csv", ",");
-                        synonyms = reader.extract("resources"+seprator+"Mouse_synonym.csv", ",");
+                        synonyms = reader.extract(homePath +"/resources"+seprator+"Mouse_synonym.csv", ",");
                         new_all_genes = cSynonym.withSynonym(synonyms);
                         System.out.println("Size of Mouse synonym list:   " + new_all_genes.size());
                         //writing gene with synonyms
@@ -785,6 +790,7 @@ public class GeneMinerUI extends javax.swing.JFrame {
     private void fetchSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fetchSettingsActionPerformed
         AbstractSettings abstractSetting = new AbstractSettings();
         abstractSetting.setabstract();
+        settingFetch = true;
     }//GEN-LAST:event_fetchSettingsActionPerformed
 
     private void aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutActionPerformed

@@ -193,7 +193,9 @@ public class AbstractSettings extends javax.swing.JFrame {
     private void synonymActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_synonymActionPerformed
         if (human.isEnabled() || mouse.isEnabled()) {
             human.setEnabled(false);
+            human.setSelected(false);
             mouse.setEnabled(false);
+            mouse.setSelected(false);
         } else {
             human.setEnabled(true);
             mouse.setEnabled(true);
@@ -202,7 +204,8 @@ public class AbstractSettings extends javax.swing.JFrame {
 
     private void humanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_humanActionPerformed
         if (mouse.isEnabled()){
-        mouse.setEnabled(false);
+            mouse.setSelected(false);
+            mouse.setEnabled(false);
         }
         else{
             mouse.setEnabled(true);
@@ -211,7 +214,8 @@ public class AbstractSettings extends javax.swing.JFrame {
 
     private void mouseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseActionPerformed
         if (human.isEnabled()){
-        human.setEnabled(false);
+            human.setSelected(false);
+            human.setEnabled(false);
         }
         else{
             human.setEnabled(true);

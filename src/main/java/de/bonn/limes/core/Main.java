@@ -53,7 +53,7 @@ public class Main {
         String filepath = "/home/peeyush/Desktop/genes.csv";
         System.out.println(filepath);
         String addQuery = "";
-        int maxAbs = 50;
+        int maxAbs = 100;
         int perRun = 50;
         int synonym = 0;
         int human = 1;

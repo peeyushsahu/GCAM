@@ -25,10 +25,8 @@ import java.util.TreeMap;
 import java.io.IOException;
 import java.util.List;
 import static de.bonn.limes.gui.GeneMinerUI.progressbarCount;
-import abner.*;
 import static de.bonn.limes.core.FindDirectoryAddress.dirPath;
 import de.bonn.limes.gcam.abner.MyTagger;
-//import de.bonn.limes.gcam.abner.MyTagger;
 import java.io.File;
 
 /**
@@ -86,7 +84,7 @@ public class AbnerAnalysis {
                 String[] cell_type = t.getEntities(s,"CELL_TYPE");
                 if(cell_type.length > 0){
                     for (String cell_t:cell_type) {
-                        System.out.println("Cell_Type: "+cell_t);
+                        //System.out.println("Cell_Type: "+cell_t);
                         entity.add(cell_t);
                         }
                 }
